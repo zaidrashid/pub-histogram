@@ -36,17 +36,7 @@
             "src/**/*.html",
             "!src/index.html"
         ],
-        "assets": [
-            "src/assets/**/*",
-            "!src/assets/js",
-            "!src/assets/packages",
-            "!src/assets/scss",
-            "!src/assets/css",
-            "!src/assets/js/**/*",
-            "!src/assets/packages/**/*",
-            "!src/assets/scss/**/*",
-            "!src/assets/css/**/*"
-        ]
+        "assets": []
     },
     "imports": {
         "modules": {
@@ -67,8 +57,8 @@
             "src/mainModule.js",
             "src/mainRoute.js",
             "src/mainController.js",
-            "src/components/**/*.js",
-            "src/landing/**/*.js",
+            "src/components/**/!(*.test).js",
+            "src/search/**/!(*.test).js",
             ".build/js/templates.js"
         ],
         "css": []

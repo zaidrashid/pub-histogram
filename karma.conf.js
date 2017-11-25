@@ -16,6 +16,7 @@ module.exports = function(config) {
     // list of files / patterns to load in the browser
     files: [
       'node_modules/angular/angular.js',
+      'node_modules/angular-mocks/angular-mocks.js',
       'node_modules/angular-route/angular-route.js',
       'node_modules/angular-animate/angular-animate.js',
       'node_modules/angular-sanitize/angular-sanitize.min.js',
@@ -24,7 +25,7 @@ module.exports = function(config) {
       'src/mainRoute.js',
       'src/mainController.js',
       'src/components/**/*.js',
-      'src/landing/**/*.js'
+      'src/search/**/*.js'
     ],
 
 

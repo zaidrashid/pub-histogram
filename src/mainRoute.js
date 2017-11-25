@@ -3,11 +3,11 @@
     var app = angular.module('pubHistogram');
     app.config(['$routeProvider', function($routeProvider) {
         $routeProvider.
-            when('/landing', {
-                templateUrl: 'landing/landing.html'
+            when('/search', {
+                templateUrl: 'search/search.html'
             }).
             otherwise({
-                redirectTo: '/landing'
+                redirectTo: '/search'
             });
     }]);
 })(window.angular);
