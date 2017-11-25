@@ -1,8 +1,8 @@
 (function($angular) {
     $angular.module('pubHistogram', [
         'ngRoute',
-        'ngAnimate',
         'ngSanitize',
+        'ngAnimate',
         'ui.bootstrap'
     ]);
 })(window.angular);

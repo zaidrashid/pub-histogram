@@ -24,8 +24,9 @@ module.exports = function(config) {
       'src/mainModule.js',
       'src/mainRoute.js',
       'src/mainController.js',
+      'src/search/**/*.js',
       'src/components/**/*.js',
-      'src/search/**/*.js'
+      'src/components/**/*.html',
     ],
 
 
@@ -40,9 +41,18 @@ module.exports = function(config) {
       // source files, that you wanna generate coverage for
       // do not include tests or libraries
       // (these files will be instrumented by Istanbul)
-      'src/**/!(*.test).js': ['coverage']
+      'src/**/!(*.test).js': ['coverage'],
+      'src/components/**/*.html': ['ng-html2js'],
     },
 
+    ngHtml2JsPreprocessor: {
+      // If your build process changes the path to your templates,
+      // use stripPrefix and prependPrefix to adjust it.
+      stripPrefix: 'src/',
+
+      // the name of the Angular module to create
+      moduleName: 'testtemplates'
+  },
 
     // test results reporter to use
     // possible values: 'dots', 'progress'
@@ -90,6 +100,15 @@ module.exports = function(config) {
 
     // Concurrency level
     // how many browser should be started simultaneous
-    concurrency: Infinity
+    concurrency: Infinity,
+
+    plugins: [
+      'karma-jasmine',
+      'karma-phantomjs-launcher',
+      'karma-chrome-launcher',
+      'karma-coverage',
+      'karma-html-reporter',
+      'karma-ng-html2js-preprocessor'
+  ]
   });
 };
