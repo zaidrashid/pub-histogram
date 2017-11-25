@@ -4,7 +4,10 @@
   "description": "A histogram of publication (across years) with the details of highest cited paper on each year from Europe PMC",
   "main": "index.js",
   "scripts": {
-    "build": "npm install && gulp"
+    "postinstall": "npm run build",
+    "build": "./node_modules/.bin/gulp",
+    "test": "./node_modules/.bin/karma start karma.conf.js",
+    "single-test": "./node_modules/.bin/karma start karma.conf.js --single-run"
   },
   "repository": {
     "type": "git",
@@ -45,6 +48,12 @@
     "gulp-rev": "^8.1.0",
     "gulp-sass": "^3.1.0",
     "http-server": "^0.10.0",
+    "jasmine-core": "^2.8.0",
+    "karma": "^1.7.1",
+    "karma-coverage": "^1.1.1",
+    "karma-html-reporter": "^0.2.7",
+    "karma-jasmine": "^1.1.0",
+    "karma-phantomjs-launcher": "^1.0.4",
     "path": "^0.12.7"
   }
 }
