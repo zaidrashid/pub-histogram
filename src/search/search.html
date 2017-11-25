@@ -1,10 +1,9 @@
-<div class='landing' ng-controller="landingController">
+<div class='search' ng-controller="searchController">
 
     <div class="title jumbotron">
         <h1 class="display-1">Publication Histogram</h1>
         <p class="lead">A histogram of publication (across years) based on queries from Europe PMC.</p>
     </div>
-
 
     <form>
         <div class="form-row">
@@ -13,11 +12,11 @@
             </div>
             from
             <div class="col-sm-2">
-                <ph-year-picker start-year=2007></ph-year-picker>
+                <ph-year-picker start-year=startYear></ph-year-picker>
             </div>
             to
             <div class="col-sm-2">
-                <ph-year-picker start-year=2017></ph-year-picker>
+                <ph-year-picker start-year=endYear></ph-year-picker>
             </div>
             <div class="col-auto">
                 <button type="submit" class="btn btn-primary">Search</button>

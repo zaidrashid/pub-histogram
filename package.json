@@ -4,7 +4,10 @@
   "description": "A histogram of publication (across years) with the details of highest cited paper on each year from Europe PMC",
   "main": "index.js",
   "scripts": {
-    "build": "npm install && gulp"
+    "postinstall": "npm run build",
+    "build": "./node_modules/.bin/gulp",
+    "test": "./node_modules/.bin/karma start karma.conf.js",
+    "single-test": "./node_modules/.bin/karma start karma.conf.js --single-run"
   },
   "repository": {
     "type": "git",
@@ -31,6 +34,7 @@
     "bootstrap": "^3.3.7"
   },
   "devDependencies": {
+    "angular-mocks": "^1.6.7",
     "async": "^2.6.0",
     "del": "^3.0.0",
     "eslint": "^4.11.0",
@@ -45,6 +49,15 @@
     "gulp-rev": "^8.1.0",
     "gulp-sass": "^3.1.0",
     "http-server": "^0.10.0",
+    "jasmine-core": "^2.8.0",
+    "karma": "^1.7.1",
+    "karma-chrome-launcher": "^2.2.0",
+    "karma-coverage": "^1.1.1",
+    "karma-html-reporter": "^0.2.7",
+    "karma-jasmine": "^1.1.0",
+    "karma-ng-html2js-preprocessor": "^1.0.0",
+    "karma-phantomjs-launcher": "^1.0.4",
+    "ng-html2js": "^3.0.0",
     "path": "^0.12.7"
   }
 }
