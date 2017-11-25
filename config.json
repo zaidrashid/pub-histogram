@@ -13,6 +13,7 @@
         "moduleFiles": ".build/module/*.js",
         "css": ".build/css",
         "cssFiles": ".build/css/*.css",
+        "fonts": ".build/fonts",
         "index": ".build/index.html",
         "assetFolder": ".build/assets"
     },
@@ -20,7 +21,8 @@
         "root": "docs/",
         "index": "docs/index.html",
         "jsFiles": "docs/*.js",
-        "cssFiles": "docs/*.css"    
+        "cssFiles": "docs/*.css",
+        "fonts": "docs/fonts"   
     },
     "src": {
         "root": "src",
@@ -50,13 +52,30 @@
         "modules": {
             "js": [
                 "node_modules/angular/angular.js",
-                "node_modules/angular-route/angular-route.js"
+                "node_modules/angular-route/angular-route.js",
+                "node_modules/angular-animate/angular-animate.js",                
+                "node_modules/angular-sanitize/angular-sanitize.min.js",
+                "node_modules/angular-ui-bootstrap/dist/ui-bootstrap-tpls.js"
             ],
-            "css": [],
-            "fonts":[]
+            "css": [
+                "node_modules/bootstrap/dist/css/bootstrap.min.css",
+                "node_modules/angular-ui-bootstrap/dist/ui-bootstrap-csp.css"
+            ],
+            "fonts":[
+                "node_modules/bootstrap/dist/fonts/glyphicons-halflings-regular.eot",
+                "node_modules/bootstrap/dist/fonts/glyphicons-halflings-regular.svg",
+                "node_modules/bootstrap/dist/fonts/glyphicons-halflings-regular.ttf",
+                "node_modules/bootstrap/dist/fonts/glyphicons-halflings-regular.woff",
+                "node_modules/bootstrap/dist/fonts/glyphicons-halflings-regular.woff2"
+            ]
         },
         "js": [
-            "src/mainController.js"
+            "src/mainModule.js",
+            "src/mainRoute.js",
+            "src/mainController.js",
+            "src/components/**/*.js",
+            "src/landing/**/*.js",
+            ".build/js/templates.js"
         ],
         "css": []
     }

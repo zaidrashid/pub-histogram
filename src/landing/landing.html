@@ -1,0 +1,27 @@
+<div class='landing' ng-controller="landingController">
+
+    <div class="title jumbotron">
+        <h1 class="display-1">Publication Histogram</h1>
+        <p class="lead">A histogram of publication (across years) based on queries from Europe PMC.</p>
+    </div>
+
+
+    <form>
+        <div class="form-row">
+            <div class="col-sm-5">
+                <input type="text" class="form-control mb-2 mb-sm-0" id="inlineFormInputName" placeholder="Try DNA">
+            </div>
+            from
+            <div class="col-sm-2">
+                <ph-year-picker start-year=2007></ph-year-picker>
+            </div>
+            to
+            <div class="col-sm-2">
+                <ph-year-picker start-year=2017></ph-year-picker>
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-primary">Search</button>
+            </div>
+        </div>
+    </form>
+</div>

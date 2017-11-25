@@ -11,6 +11,8 @@
     var rev = require('gulp-rev');
     var sass = require('gulp-sass');
     var csso = require('gulp-csso');
+    var ngHtml2Js = require('gulp-ng-html2js');
+    var htmlmin = require('gulp-htmlmin');
 
     var homePath = process.cwd();
     var config = require(path.join(homePath, 'config.json'));
@@ -30,6 +32,12 @@
         }
 
         return files;
+    }
+
+    function copyFontFiles(done, source, destination) {
+        gulp.src(source)
+            .pipe(gulp.dest(destination))
+            .on('end', done);
     }
 
     function injectFiles(done, target, root, files) {
@@ -53,18 +61,22 @@
             function prepareBuild(done) {
                 async.series([
                     copyIndex,
+                    processTemplateFiles,
                     copyJsModuleFiles,
                     copyJsFiles,
                     injectJsFiles,
+                    copyCssModuleFiles,
                     generateCssFiles,
-                    injectCssFiles
+                    injectCssFiles,
+                    copyFontFilesForBuild,
                 ], done);
             },
-            function prepareDist(done) {
+            function prepareDocs(done) {
                 async.series([
                     copyBaseFiles,
                     combineAndInjectJsFiles,
-                    combineAndInjectCss
+                    combineAndInjectCss,
+                    copyFontFilesForDocs
                 ], done);
             }
         ]);
@@ -74,6 +86,18 @@
     function copyIndex(done) {
         gulp.src(config.src.index)
             .pipe(gulp.dest(config.build.root))
+            .on('end', done);
+    }
+
+    function processTemplateFiles(done) {
+        gulp.src(config.src.html)
+            .pipe(htmlmin({collapseWhitespace: false}))
+            .pipe(ngHtml2Js({
+                moduleName: 'pubHistogram',
+                declareModule: false
+            }))
+            .pipe(concat('templates.js'))
+            .pipe(gulp.dest(config.build.js))
             .on('end', done);
     }
 
@@ -96,6 +120,12 @@
         injectFiles(done, target, root, files);
     }
 
+    function copyCssModuleFiles(done) {
+        gulp.src(config.imports.modules.css)
+            .pipe(gulp.dest(config.build.css))
+            .on('end', done);
+    }
+
     function generateCssFiles(done) {
         gulp.src(config.src.scss)
             .pipe(sass().on('error', sass.logError))
@@ -108,6 +138,10 @@
         var root = config.build.root;
         var files = config.build.cssFiles;
         injectFiles(done, target, root, files);
+    }
+
+    function copyFontFilesForBuild(done) {
+        copyFontFiles(done, config.imports.modules.fonts, config.build.fonts);
     }
 
     // dist process
@@ -138,5 +172,9 @@
             .on('end', function() {
                 injectFiles(done, config.dist.index, config.dist.root, config.dist.cssFiles);
             });
+    }
+
+    function copyFontFilesForDocs(done) {
+        copyFontFiles(done, config.imports.modules.fonts, config.dist.fonts);
     }
 })();

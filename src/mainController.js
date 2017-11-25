@@ -1,8 +1,7 @@
 (function($angular) {
-    $angular.module('pubHistogram', []);
     var app = $angular.module('pubHistogram');
 
     app.controller('mainController', function($scope) {
-        $scope.message = 'Loaded';
+        console.log('main controller loaded');
     });
 })(window.angular);
