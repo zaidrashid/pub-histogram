@@ -17,10 +17,10 @@
         "assetFolder": ".build/assets"
     },
     "dist": {
-        "root": ".dist/",
-        "index": ".dist/index.html",
-        "jsFiles": ".dist/*.js",
-        "cssFiles": ".dist/*.css"    
+        "root": "docs/",
+        "index": "docs/index.html",
+        "jsFiles": "docs/*.js",
+        "cssFiles": "docs/*.css"    
     },
     "src": {
         "root": "src",
