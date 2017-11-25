@@ -47179,8 +47179,9 @@ angular.module('ui.bootstrap.typeahead').run(function() {!angular.$$csp().noInli
             };
 
             $ctrl.onDatePicked = function() {
-                console.log($ctrl.dt);
-            }
+
+            };
+
             init();
         }
     });
