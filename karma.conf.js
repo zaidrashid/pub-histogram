@@ -21,12 +21,16 @@ module.exports = function(config) {
       'node_modules/angular-animate/angular-animate.js',
       'node_modules/angular-sanitize/angular-sanitize.min.js',
       'node_modules/angular-ui-bootstrap/dist/ui-bootstrap-tpls.js',
+      'node_modules/moment/moment.js',
       'src/mainModule.js',
       'src/mainRoute.js',
       'src/mainController.js',
-      'src/search/**/*.js',
       'src/components/**/*.js',
       'src/components/**/*.html',
+      'src/search/**/*.js',
+      'src/factory/**/*.js',
+      'src/publication/**/*.js',
+      'src/util/**/*js'
     ],
 
 
