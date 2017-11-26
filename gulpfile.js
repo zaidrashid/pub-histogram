@@ -18,13 +18,18 @@
     var config = require(path.join(homePath, 'config.json'));
 
     // generic methods
-    function generateJsFilesInOrder() {
+    function generateJsFilesInOrder(postDocs) {
         var files = [];
 
-        var moduleFiles = config.imports.modules.js;
-        for (var i = 0; i < moduleFiles.length; i++) {
-            files.push(path.join(config.build.module, path.basename(moduleFiles[i])));
+        var modules = config.imports.modules;
+        if (postDocs) {
+            files = files.concat(modules.jsForDocs);
+        } else {
+            for (var i = 0; i < modules.js.length; i++) {
+                files.push(path.join(config.build.module, path.basename(modules.js[i])));
+            }
         }
+
 
         var jsFiles = config.imports.js;
         for (i = 0; i < jsFiles.length; i++) {
@@ -152,7 +157,7 @@
     }
 
     function combineAndInjectJsFiles(done) {
-        var files = generateJsFilesInOrder();
+        var files = generateJsFilesInOrder(true);
         gulp.src(files)
             .pipe(ngAnnotate())
             .pipe(concat('system.js'))
