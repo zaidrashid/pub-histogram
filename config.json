@@ -45,14 +45,16 @@
                 "node_modules/angular-route/angular-route.js",
                 "node_modules/angular-animate/angular-animate.js",                
                 "node_modules/angular-sanitize/angular-sanitize.js",
-                "node_modules/angular-ui-bootstrap/dist/ui-bootstrap-tpls.js"
+                "node_modules/angular-ui-bootstrap/dist/ui-bootstrap-tpls.js",
+                "node_modules/moment/moment.js"
             ],
             "jsForDocs": [
                 "node_modules/angular/angular.min.js",
                 "node_modules/angular-route/angular-route.min.js",
                 "node_modules/angular-animate/angular-animate.min.js",                
                 "node_modules/angular-sanitize/angular-sanitize.min.js",
-                "node_modules/angular-ui-bootstrap/dist/ui-bootstrap-tpls.js"
+                "node_modules/angular-ui-bootstrap/dist/ui-bootstrap-tpls.js",
+                "node_modules/moment/min/moment.min.js"
             ],
             "css": [
                 "node_modules/angular-ui-bootstrap/dist/ui-bootstrap-csp.css"
@@ -66,6 +68,9 @@
             "src/mainController.js",
             "src/components/**/!(*.test).js",
             "src/search/**/!(*.test).js",
+            "src/util/**/!(*.test).js",
+            "src/factory/**/!(*.test).js",
+            "src/publication/**/!(*.test).js",
             ".build/js/templates.js"
         ],
         "css": []
