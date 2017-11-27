@@ -6,6 +6,7 @@
         templateUrl: 'components/phYearPicker.html',
         bindings: {
             startYear: '<',
+            onYearUpdate: '&'
         },
         controller: function() {
             var $ctrl = this;
@@ -40,7 +41,7 @@
             };
 
             $ctrl.onDatePicked = function() {
-
+                $ctrl.onYearUpdate({dt: $ctrl.dt});
             };
 
             init();
