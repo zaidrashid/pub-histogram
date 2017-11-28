@@ -3,7 +3,7 @@
 
     var app = $angular.module('pubHistogram');
 
-    app.factory('PmcApi', function($q, networkUtil, stringUtil, dateUtil) {
+    app.factory('PmcApi', function($q, networkUtil, stringUtil, dateUtil, publicationUtil) {
         var config = {
             type: 'query',
             baseUrl: 'https://www.ebi.ac.uk/europepmc/webservices/rest/search/',
@@ -16,18 +16,6 @@
 
         function PmcApi() { }
 
-        function executeRequest(requests) {
-            var defer = $q.defer();
-            var promises = [];
-            for (var i=0; i < requests.length; i++) {
-                promises.push(networkUtil.httpGet({url: requests[i]}));
-            }
-
-            $q.all(promises).then(defer.resolve, defer.reject);
-
-            return defer.promise;
-        }
-
         function search(query, startYear, endYear) {
             var defer = $q.defer();
             var years = dateUtil.separateYears(startYear, endYear);
@@ -37,7 +25,12 @@
                 requests.push(generateRequest(query, years[i].dateStart, years[i].dateEnd));
             }
 
-            executeRequest(requests).then(defer.resolve, defer.reject);
+            networkUtil.httpMultipleGet(requests).then(function(res) {
+                console.log(res);
+                var result = publicationUtil.generatePublicationDataByYears(res);
+                console.log(result);
+                defer.resolve(result);
+            }, defer.reject);
             return defer.promise;
         }
 
