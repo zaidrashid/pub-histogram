@@ -4,14 +4,27 @@
     var app = $angular.module('pubHistogram');
     app.factory('networkUtil', function($q, $http) {
         function httpGet(config) {
-            var promise = $q.defer();
+            var defer = $q.defer();
             config.method = 'GET',
-            $http(config).then(promise.resolve, promise.reject);
-            return promise.promise;
+            $http(config).then(defer.resolve, defer.reject);
+            return defer.promise;
+        }
+
+        function httpMultipleGet(requests) {
+            var defer = $q.defer();
+            var promises = [];
+            for (var i=0; i < requests.length; i++) {
+                promises.push(httpGet({url: requests[i]}));
+            }
+
+            $q.all(promises).then(defer.resolve, defer.reject);
+
+            return defer.promise;
         }
 
         return {
-            httpGet: httpGet
+            httpGet: httpGet,
+            httpMultipleGet: httpMultipleGet
         };
     });
 })(window.angular);

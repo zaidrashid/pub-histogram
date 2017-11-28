@@ -29,6 +29,7 @@ module.exports = function(config) {
       'src/components/**/*.html',
       'src/search/**/*.js',
       'src/factory/**/*.js',
+      'src/models/**/*.js',
       'src/publication/**/*.js',
       'src/util/**/*js'
     ],

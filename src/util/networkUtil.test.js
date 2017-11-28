@@ -104,10 +104,34 @@ describe('networkUtil.test.js', function() {
         $http.and.returnValue(defer.promise);
 
         // Act
-        networkUtil.httpGet(config).then(function(res) {
-            expect(res.err).toBe(true);
-            expect($http).toHaveBeenCalled();
-            expect($http).toHaveBeenCalledWith(config);
+        networkUtil.httpGet(config).then(function(res) { },
+            function(err) {
+                expect(err.err).toBe(true);
+                expect($http).toHaveBeenCalled();
+                expect($http).toHaveBeenCalledWith(config);
+        });
+    });
+
+    it('httpmultipleget_success', function() {
+        // Arrange
+        var urls = [
+            'http://test.url.com',
+            'http://test.url.2.com'
+        ];
+
+        initialize();
+        $q.all = function(promises) {
+            return {
+                then: function(callback) {
+                        callback(urls);
+                    }
+            };
+        };
+
+        // Act
+        networkUtil.httpMultipleGet(urls).then(function(res) {
+            expect(res).toEqual(jasmine.any(Array));
+            expect(res.length).toBe(2);
         });
     });
 });
