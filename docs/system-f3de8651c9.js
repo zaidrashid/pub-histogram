@@ -8267,6 +8267,97 @@ angular.module('ui.bootstrap.typeahead').run(function() {!angular.$$csp().noInli
     'use strict';
 
     var app = $angular.module('pubHistogram');
+
+    app.factory('PmcApi', ["$q", "networkUtil", "stringUtil", "dateUtil", "publicationUtil", function($q, networkUtil, stringUtil, dateUtil, publicationUtil) {
+        var config = {
+            type: 'query',
+            baseUrl: 'https://www.ebi.ac.uk/europepmc/webservices/rest/search/',
+            options: [
+                {key: 'sort', value: 'CITED desc'},
+                {key: 'format', value: 'JSON'},
+                {key: 'pageSize', value: 1}
+            ]
+        };
+
+        function PmcApi() { }
+
+        function search(query, startYear, endYear) {
+            var defer = $q.defer();
+            var years = dateUtil.separateYears(startYear, endYear);
+
+            var requests = [];
+            for (var i=0; i < years.length; i++) {
+                requests.push(generateRequest(query, years[i].dateStart, years[i].dateEnd));
+            }
+
+            networkUtil.httpMultipleGet(requests).then(function(res) {
+                console.log(res);
+                var result = publicationUtil.generatePublicationDataByYears(res);
+                console.log(result);
+                defer.resolve(result);
+            }, defer.reject);
+            return defer.promise;
+        }
+
+        function generateDateRange(startYear, endYear) {
+            var q = '(FIRST_PDATE:[{0} TO {1}])';
+            return stringUtil.formatString(q, [startYear, endYear]);
+        }
+
+        function addAditionalOptions(query) {
+            for (var i=0; i < config.options.length; i++) {
+                var newKey = config.options[i].key;
+                var newVal = encodeURIComponent(config.options[i].value);
+                query += stringUtil.formatString('&{0}={1}', [newKey, newVal]);
+            }
+
+            return query;
+        }
+
+        function generateQuery(query, startYear, endYear) {
+            var dateRange = generateDateRange(startYear, endYear);
+            var queryString = stringUtil.formatString('{0} AND {1}', [query, dateRange]);
+
+            var encodedQuery = encodeURIComponent(queryString);
+            var baseQuery = stringUtil.formatString('{0}={1}', [config.type, encodedQuery]);
+            var finalQuery = addAditionalOptions(baseQuery);
+            return finalQuery;
+        }
+
+        function generateRequest(query, startYear, endYear) {
+            var queryString = generateQuery(query, startYear, endYear);
+            return stringUtil.formatString('{0}{1}', [config.baseUrl, queryString]);
+        }
+
+        PmcApi.prototype = {
+            config: config,
+            search: search
+        };
+
+        return (PmcApi);
+    }]);
+})(window.angular);
+
+(function($angular) {
+    'use strict';
+
+    var app = $angular.module('pubHistogram');
+
+    app.factory('Publication', function() {
+        function Publication(year, count, mostCited) {
+            this.year = year;
+            this.count = count;
+            this.mostCited = mostCited;
+        }
+
+        return (Publication);
+    });
+})(window.angular);
+
+(function($angular) {
+    'use strict';
+
+    var app = $angular.module('pubHistogram');
     app.factory('dateUtil', ["stringUtil", function(stringUtil) {
         var config = {
             DATE_FORMAT: 'YYYY-MM-DD'
@@ -8316,14 +8407,27 @@ angular.module('ui.bootstrap.typeahead').run(function() {!angular.$$csp().noInli
     var app = $angular.module('pubHistogram');
     app.factory('networkUtil', ["$q", "$http", function($q, $http) {
         function httpGet(config) {
-            var promise = $q.defer();
+            var defer = $q.defer();
             config.method = 'GET',
-            $http(config).then(promise.resolve, promise.reject);
-            return promise.promise;
+            $http(config).then(defer.resolve, defer.reject);
+            return defer.promise;
+        }
+
+        function httpMultipleGet(requests) {
+            var defer = $q.defer();
+            var promises = [];
+            for (var i=0; i < requests.length; i++) {
+                promises.push(httpGet({url: requests[i]}));
+            }
+
+            $q.all(promises).then(defer.resolve, defer.reject);
+
+            return defer.promise;
         }
 
         return {
-            httpGet: httpGet
+            httpGet: httpGet,
+            httpMultipleGet: httpMultipleGet
         };
     }]);
 })(window.angular);
@@ -8336,7 +8440,6 @@ angular.module('ui.bootstrap.typeahead').run(function() {!angular.$$csp().noInli
         templateUrl: 'components/phYearPicker.html',
         bindings: {
             startYear: '<',
-            onYearUpdate: '&'
         },
         controller: function() {
             var $ctrl = this;
@@ -8371,94 +8474,12 @@ angular.module('ui.bootstrap.typeahead').run(function() {!angular.$$csp().noInli
             };
 
             $ctrl.onDatePicked = function() {
-                $ctrl.onYearUpdate({dt: $ctrl.dt});
+
             };
 
             init();
         }
     });
-})(window.angular);
-
-(function($angular) {
-    'use strict';
-
-    var app = $angular.module('pubHistogram');
-
-    app.factory('PmcApi', ["$q", "networkUtil", "stringUtil", "dateUtil", function($q, networkUtil, stringUtil, dateUtil) {
-        var config = {
-            type: 'query',
-            baseUrl: 'https://www.ebi.ac.uk/europepmc/webservices/rest/search/',
-            options: [
-                {key: 'sort', value: 'CITED desc'},
-                {key: 'format', value: 'JSON'},
-                {key: 'pageSize', value: 1}
-            ]
-        };
-
-        function PmcApi() { }
-
-        function executeRequest(requests) {
-            var defer = $q.defer();
-            var promises = [];
-            for (var i=0; i < requests.length; i++) {
-                promises.push(networkUtil.httpGet({url: requests[i]}));
-            }
-
-            $q.all(promises).then(defer.resolve, defer.reject);
-
-            return defer.promise;
-        }
-
-        function search(query, startYear, endYear) {
-            var defer = $q.defer();
-            var years = dateUtil.separateYears(startYear, endYear);
-
-            var requests = [];
-            for (var i=0; i < years.length; i++) {
-                requests.push(generateRequest(query, years[i].dateStart, years[i].dateEnd));
-            }
-
-            executeRequest(requests).then(defer.resolve, defer.reject);
-            return defer.promise;
-        }
-
-        function generateDateRange(startYear, endYear) {
-            var q = '(FIRST_PDATE:[{0} TO {1}])';
-            return stringUtil.formatString(q, [startYear, endYear]);
-        }
-
-        function addAditionalOptions(query) {
-            for (var i=0; i < config.options.length; i++) {
-                var newKey = config.options[i].key;
-                var newVal = encodeURIComponent(config.options[i].value);
-                query += stringUtil.formatString('&{0}={1}', [newKey, newVal]);
-            }
-
-            return query;
-        }
-
-        function generateQuery(query, startYear, endYear) {
-            var dateRange = generateDateRange(startYear, endYear);
-            var queryString = stringUtil.formatString('{0} AND {1}', [query, dateRange]);
-
-            var encodedQuery = encodeURIComponent(queryString);
-            var baseQuery = stringUtil.formatString('{0}={1}', [config.type, encodedQuery]);
-            var finalQuery = addAditionalOptions(baseQuery);
-            return finalQuery;
-        }
-
-        function generateRequest(query, startYear, endYear) {
-            var queryString = generateQuery(query, startYear, endYear);
-            return stringUtil.formatString('{0}{1}', [config.baseUrl, queryString]);
-        }
-
-        PmcApi.prototype = {
-            config: config,
-            search: search
-        };
-
-        return (PmcApi);
-    }]);
 })(window.angular);
 
 (function($angular) {
@@ -8493,43 +8514,58 @@ angular.module('ui.bootstrap.typeahead').run(function() {!angular.$$csp().noInli
 })(window.angular);
 
 (function($angular) {
+    'use strict';
+
+    var app = $angular.module('pubHistogram');
+    app.factory('publicationUtil', ["Publication", function(Publication) {
+        // publication.count = data.hitCount
+        //                      data.resultList.result[] == 1
+        // publication.mostCited = result[0]
+        // publication.year = results[0].pubYear;
+        function generatePublicationDataByYears(res) {
+            if (!res || !res.length) {
+                return;
+            }
+
+            var publicationList = [];
+            for (var i=0; i < res.length; i++) {
+                var data = res[i].data;
+                if (!data) {
+                    continue;
+                }
+
+                var year;
+                var count;
+                var mostCited;
+
+                count = data.hitCount || 0;
+                if (data.resultList && data.resultList.result && data.resultList.result.length > 0) {
+                    var result = data.resultList.result[0];
+                    mostCited = result;
+                    year = result.pubYear;
+                }
+                publicationList.push(new Publication(year, count, mostCited));
+            }
+
+            return publicationList;
+        }
+
+        return {
+            generatePublicationDataByYears: generatePublicationDataByYears
+        };
+    }]);
+})(window.angular);
+
+(function($angular) {
     var app = $angular.module('pubHistogram');
 
-    app.controller('searchController', ["$scope", "publicationApiFactory", function($scope, publicationApiFactory) {
-        var api;
-        var search = {};
-
+    app.controller('searchController', ["$scope", function($scope) {
         function init() {
             var currentYear = new Date().getFullYear();
 
             $scope.startYear = currentYear - 10;
             $scope.endYear = currentYear;
-
-            search.start = new Date($scope.startYear);
-            search.end = new Date($scope.endYear);
-            api = publicationApiFactory.getApi();
         }
-
-        $scope.onSearch = function() {
-            search.query = $scope.searchText;
-            console.log(search.query);
-            console.log(search.start);
-            console.log(search.end);
-            api.search(search.query, search.start, search.end).then(function(res) {
-                console.log('success');
-                console.log(res);
-            }, function(err) {
-                console.log(err);
-            });
-        };
-
-        $scope.onStartYearUpdate = function(dt) {
-            search.start = dt;
-        };
-
-        $scope.onEndYearUpdate = function(dt) {
-            search.end = dt;
-        };
 
         init();
     }]);
@@ -8582,25 +8618,25 @@ angular.module('pubHistogram').run(['$templateCache', function($templateCache) {
     '<div class="search" ng-controller="searchController">\n' +
     '\n' +
     '    <div class="title jumbotron">\n' +
-    '        <h2 class="display-1">Publication Histogram</h2>\n' +
+    '        <h1 class="display-1">Publication Histogram</h1>\n' +
     '        <p class="lead">A histogram of publication (across years) based on queries from Europe PMC.</p>\n' +
     '    </div>\n' +
     '\n' +
     '    <form>\n' +
     '        <div class="form-row">\n' +
     '            <div class="col-sm-5">\n' +
-    '                <input type="text" class="form-control mb-2 mb-sm-0" id="inlineFormInputName" placeholder="Try DNA" ng-model="searchText">\n' +
+    '                <input type="text" class="form-control mb-2 mb-sm-0" id="inlineFormInputName" placeholder="Try DNA">\n' +
     '            </div>\n' +
     '            from\n' +
     '            <div class="col-sm-2">\n' +
-    '                <ph-year-picker start-year="startYear" on-year-update="onStartYearUpdate(dt)"></ph-year-picker>\n' +
+    '                <ph-year-picker start-year="startYear"></ph-year-picker>\n' +
     '            </div>\n' +
     '            to\n' +
     '            <div class="col-sm-2">\n' +
-    '                <ph-year-picker start-year="endYear" on-year-update="onEndYearUpdate(dt)"></ph-year-picker>\n' +
+    '                <ph-year-picker start-year="endYear"></ph-year-picker>\n' +
     '            </div>\n' +
     '            <div class="col-auto">\n' +
-    '                <button type="submit" class="btn btn-primary" ng-click="onSearch()">Search</button>\n' +
+    '                <button type="submit" class="btn btn-primary">Search</button>\n' +
     '            </div>\n' +
     '        </div>\n' +
     '    </form>\n' +

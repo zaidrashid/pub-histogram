@@ -2,6 +2,7 @@ describe('PmcApi.test.js', function() {
     var PmcApi;
     var $q;
     var networkUtil;
+    var publicationUtil;
 
     beforeEach(module('pubHistogram'));
     beforeEach(function() {
@@ -11,13 +12,16 @@ describe('PmcApi.test.js', function() {
         PmcApi = null;
         $q = null;
         networkUtil = null;
+        publicationUtil = null;
         jasmine.clock().uninstall();
     });
 
     function initialize() {
-        networkUtil = jasmine.createSpyObj('networkUtil', ['httpGet']);
+        networkUtil = jasmine.createSpyObj('networkUtil', ['httpMultipleGet']);
+        publicationUtil = jasmine.createSpyObj('publicationutil', ['generatePublicationDataByYears']);
         module(function($provide) {
             $provide.value('networkUtil', networkUtil);
+            $provide.value('publicationUtil', publicationUtil);
         });
 
         inject(function($injector) {
@@ -76,7 +80,7 @@ describe('PmcApi.test.js', function() {
             return this;
         };
 
-        networkUtil.httpGet.and.returnValue($q.resolve());
+        networkUtil.httpMultipleGet.and.returnValue($q.resolve());
     }
 
     it('init_initializeWithBaseConfig', function() {
@@ -96,22 +100,24 @@ describe('PmcApi.test.js', function() {
         expect(api.config.type).toBe('query');
     });
 
-    it('search_searchWillProduceCorretString', function() {
+    it('search_searchWillProduceCorrectString', function() {
         // Arrange
         var query = 'malaria';
-        var finalQuery = 'https://www.ebi.ac.uk/europepmc/webservices/rest/search/query=malaria%20AND%20(FIRST_PDATE%3A%5B2007-01-01%20TO%202017-12-31%5D)&sort=CITED%20desc&format=JSON&pageSize=1';
+        var finalQuery = [
+            'https://www.ebi.ac.uk/europepmc/webservices/rest/search/query=malaria%20AND%20(FIRST_PDATE%3A%5B2016-01-01%20TO%202016-12-31%5D)&sort=CITED%20desc&format=JSON&pageSize=1',
+            'https://www.ebi.ac.uk/europepmc/webservices/rest/search/query=malaria%20AND%20(FIRST_PDATE%3A%5B2017-01-01%20TO%202017-12-31%5D)&sort=CITED%20desc&format=JSON&pageSize=1'];
         var startDate = new Date(2016, 0, 1);
         var endDate = new Date(2017, 11, 31);
         initialize();
         var defer = $q.defer();
         defer.resolve({search: true, res: 'res'});
-        networkUtil.httpGet.and.returnValue(defer.promise);
+        networkUtil.httpMultipleGet.and.returnValue(defer.promise);
         var api = new PmcApi();
 
         // Act
         api.search(query, startDate, endDate).then(function(res) {
-            expect(networkUtil.http).toHaveBeenCalled();
-            expect(networkUtil.http).toHaveBeenCalledWith(finalQuery);
+            expect(networkUtil.httpMultipleGet).toHaveBeenCalled();
+            expect(networkUtil.httpMultipleGet).toHaveBeenCalledWith(finalQuery);
         });
     });
 });

@@ -71,6 +71,7 @@
             "src/util/**/!(*.test).js",
             "src/factory/**/!(*.test).js",
             "src/publication/**/!(*.test).js",
+            "src/models/**/!(*.test).js",
             ".build/js/templates.js"
         ],
         "css": []
