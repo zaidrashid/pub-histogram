@@ -8,55 +8,12 @@
         bindings: {
             publications: '<',
         },
-        controller: function() {
+        controller: function($window, chartProviderFactory) {
             var $ctrl = this;
 
             // title = 
             // xAxis.categories = [array]
             // series.data = array of number
-            // var chartConfig = {
-            //         chart: {
-            //             type: 'bar'
-            //         },
-            //         title: {
-            //             text: 'Historic World Population by Region'
-            //         },
-            //         xAxis: {
-            //             title: {
-            //                 text: Years
-            //             }
-            //         },
-            //         yAxis: {
-            //             min: 0,
-            //             title: {
-            //                 text: 'Number of publication',
-            //                 align: 'high'
-            //             },
-            //             labels: {
-            //                 overflow: 'justify'
-            //             }
-            //         },
-            //         tooltip: {
-            //             valueSuffix: ' millions'
-            //         },
-            //         plotOptions: {
-            //             bar: {
-            //                 dataLabels: {
-            //                     enabled: true
-            //                 }
-            //             }
-            //         },
-            //         credits: {
-            //             enabled: true,
-            //             href: 'https://europepmc.org/RestfulWebService',
-            //             text: 'Europe PMC'
-            //         },
-            //         series: [{
-            //             name: 'Publication',
-            //             data: [107, 31, 635, 203, 2]
-            //         }]
-            //     };
-
             var config = {
                 chart: {
                     type: 'bar'
@@ -137,18 +94,28 @@
             };
 
             $ctrl.$onChanges = function(changes) {
+                console.log('changes', changes);
+                var newValue = changes.publications.currentValue;
+                var oldValue = changes.publications.previousValue;
+                if (newValue && newValue != oldValue) {
+                    doChartSetup(newValue);
+                }
             };
 
-            function doChartSetup() {
-                Highcharts.chart('histogram-chart', config);
+            function doChartSetup(data) {
+                var chartApi = chartProviderFactory.getApi();
+                chartApi.setTitle('Publication accross years');
+                chartApi.setData(data);
+                var finalConfig = chartApi.getConfiguration();
+                console.log(config);
+                console.log(finalConfig);
+                $window.Highcharts.chart('histogram-chart', finalConfig);
             }
 
             function init() {
-                if (!$ctrl.publications || $ctrl.publications.length) {
+                if (!$ctrl.publications || !$ctrl.publications.length) {
                     // show default
                 }
-
-                doChartSetup();
             }
 
             init();

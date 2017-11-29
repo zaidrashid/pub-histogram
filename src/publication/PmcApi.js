@@ -26,9 +26,7 @@
             }
 
             networkUtil.httpMultipleGet(requests).then(function(res) {
-                console.log(res);
                 var result = publicationUtil.generatePublicationDataByYears(res);
-                console.log(result);
                 defer.resolve(result);
             }, defer.reject);
             return defer.promise;
