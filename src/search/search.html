@@ -8,19 +8,21 @@
     <form>
         <div class="form-row">
             <div class="col-sm-5">
-                <input type="text" class="form-control mb-2 mb-sm-0" id="inlineFormInputName" placeholder="Try DNA" ng-model="searchText">
+                <input type="text" class="form-control mb-2 mb-sm-0" id="inlineFormInputName" placeholder="Try DNA" ng-model="searchText" required>
             </div>
             from
-            <div class="col-sm-2">
-                <ph-year-picker start-year=startYear on-year-update="onStartYearUpdate(dt)"></ph-year-picker>
+            <div class="col-sm-2" ng-class='startYearHasError'>
+                <ph-year-picker start-year='startYear' on-year-update="onStartYearUpdate(dt)"></ph-year-picker>
             </div>
             to
-            <div class="col-sm-2">
-                <ph-year-picker start-year=endYear on-year-update="onEndYearUpdate(dt)"></ph-year-picker>
+            <div class="col-sm-2" ng-class='endYearHasError'>
+                <ph-year-picker start-year='endYear' on-year-update="onEndYearUpdate(dt)"></ph-year-picker>
             </div>
             <div class="col-auto">
                 <button type="submit" class="btn btn-primary" ng-click="onSearch()">Search</button>
             </div>
         </div>
     </form>
+
+    <ph-histo-canvas publications="publications"></ph-histo-canvas>
 </div>
