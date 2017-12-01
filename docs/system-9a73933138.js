@@ -9203,9 +9203,8 @@ l(n.maxWidth,Number.MAX_VALUE)&&this.chartHeight<=l(n.maxHeight,Number.MAX_VALUE
 (function($angular) {
     var app = $angular.module('pubHistogram');
 
-    app.controller('searchController', ["$scope", "publicationApiFactory", function($scope, publicationApiFactory) {
+    app.controller('searchController', ["$window", "$scope", "publicationApiFactory", function($window, $scope, publicationApiFactory) {
         var api;
-        var search = {};
 
         function init() {
             var currentYear = new Date().getFullYear();
@@ -9213,29 +9212,36 @@ l(n.maxWidth,Number.MAX_VALUE)&&this.chartHeight<=l(n.maxHeight,Number.MAX_VALUE
             $scope.startYear = currentYear - 10;
             $scope.endYear = currentYear;
 
-            search.start = new Date($scope.startYear);
-            search.end = new Date($scope.endYear);
+            $scope.startDate = new Date($scope.startYear, 0, 1);
+            $scope.endDate = new Date($scope.endYear, 0, 1);
             api = publicationApiFactory.getApi();
         }
 
+        function isQueryValid() {
+            var valid = $scope.searchText &&
+                        $scope.startDate &&
+                        $scope.endDate;
+            return valid;
+        }
+
         $scope.onSearch = function() {
-            search.query = $scope.searchText;
-            console.log(search.query);
-            console.log(search.start);
-            console.log(search.end);
-            api.search(search.query, search.start, search.end).then(function(res) {
+            if (!isQueryValid()) {
+                return;
+            }
+            
+            api.search($scope.query, $scope.startDate, $scope.endDate).then(function(res) {
                 $scope.publications = res;
             }, function(err) {
-                console.log(err);
+                $window.console.log(err);
             });
         };
 
         $scope.onStartYearUpdate = function(dt) {
-            search.start = dt;
+            $scope.startDate = dt;
         };
 
         $scope.onEndYearUpdate = function(dt) {
-            search.end = dt;
+            $scope.endDate = dt;
         };
 
         init();
@@ -9296,14 +9302,14 @@ angular.module('pubHistogram').run(['$templateCache', function($templateCache) {
     '    <form>\n' +
     '        <div class="form-row">\n' +
     '            <div class="col-sm-5">\n' +
-    '                <input type="text" class="form-control mb-2 mb-sm-0" id="inlineFormInputName" placeholder="Try DNA" ng-model="searchText">\n' +
+    '                <input type="text" class="form-control mb-2 mb-sm-0" id="inlineFormInputName" placeholder="Try DNA" ng-model="searchText" required>\n' +
     '            </div>\n' +
     '            from\n' +
-    '            <div class="col-sm-2">\n' +
+    '            <div class="col-sm-2" ng-class="startYearHasError">\n' +
     '                <ph-year-picker start-year="startYear" on-year-update="onStartYearUpdate(dt)"></ph-year-picker>\n' +
     '            </div>\n' +
     '            to\n' +
-    '            <div class="col-sm-2">\n' +
+    '            <div class="col-sm-2" ng-class="endYearHasError">\n' +
     '                <ph-year-picker start-year="endYear" on-year-update="onEndYearUpdate(dt)"></ph-year-picker>\n' +
     '            </div>\n' +
     '            <div class="col-auto">\n' +

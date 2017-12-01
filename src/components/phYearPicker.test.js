@@ -2,18 +2,20 @@ describe('phYearPicker.test.js', function() {
     var element;
     var scope;
     var $route;
+    var onYearUpdate;
     beforeEach(module('pubHistogram'));
     beforeEach(module('testtemplates'));
     beforeEach(function() {
         jasmine.clock().install();
         jasmine.clock().mockDate(new Date(2017, 0, 1));
-        element = '<ph-year-picker></ph-year-picker>';
+        element = '<ph-year-picker on-year-update="onYearUpdate(dt)"></ph-year-picker>';
     });
 
     afterEach(function() {
         scope = null;
         element = null;
         $route = null;
+        onYearUpdate = null;
         jasmine.clock().uninstall();
     });
 
@@ -28,6 +30,7 @@ describe('phYearPicker.test.js', function() {
             scope = $rootScope.$new();
             element = $compile(element)(scope);
             scope.$digest();
+            scope.onYearUpdate = onYearUpdate;
         });
     }
 
@@ -95,5 +98,19 @@ describe('phYearPicker.test.js', function() {
         // Assert
         expect(controller.dt instanceof Date).toBe(true);
         expect(controller.dt.getFullYear()).toBe(2017);
+    });
+
+    it('onDatePicked_onYearUpdateIsCalled', function() {
+        // Arrange
+        onYearUpdate = jasmine.createSpy('onYearUpdate');
+        initialize();
+
+        // Act
+        var controller = element.isolateScope().$ctrl;
+        controller.onDatePicked();
+
+        // Assert
+        expect(onYearUpdate).toHaveBeenCalled();
+        expect(onYearUpdate).toHaveBeenCalledWith(jasmine.any(Object));
     });
 });
