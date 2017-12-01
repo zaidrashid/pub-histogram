@@ -27,7 +27,9 @@
                 return;
             }
 
+            $scope.loading = true;
             api.search($scope.query, $scope.startDate, $scope.endDate).then(function(res) {
+                $scope.loading = false;
                 $scope.publications = res;
             }, function(err) {
                 $window.console.log(err);

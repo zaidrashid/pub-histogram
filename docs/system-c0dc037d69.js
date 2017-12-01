@@ -9048,18 +9048,27 @@ l(n.maxWidth,Number.MAX_VALUE)&&this.chartHeight<=l(n.maxHeight,Number.MAX_VALUE
 
     var app = $angular.module('pubHistogram');
     app.component('phHistoCanvas', {
-        template: '<div id="histogram-chart"></div>',
+        templateUrl: 'components/phHistoCanvas.html',
         bindings: {
             publications: '<',
+            loading: '<'
         },
         controller: ["$window", "chartProviderFactory", function($window, chartProviderFactory) {
             var $ctrl = this;
+            $ctrl.loading = false;
 
             $ctrl.$onChanges = function(changes) {
-                var newValue = changes.publications.currentValue;
-                var oldValue = changes.publications.previousValue;
-                if (newValue && newValue != oldValue) {
-                    doChartSetup(newValue);
+                if (changes.publications) {
+                    var newValue = changes.publications.currentValue;
+                    var oldValue = changes.publications.previousValue;
+                    if (newValue && newValue != oldValue) {
+                        doChartSetup(newValue);
+                    }
+                }
+
+                if (changes.loading) {
+                    var loading = changes.loading.currentValue;
+                    $ctrl.loading = loading;
                 }
             };
 
@@ -9228,8 +9237,10 @@ l(n.maxWidth,Number.MAX_VALUE)&&this.chartHeight<=l(n.maxHeight,Number.MAX_VALUE
             if (!isQueryValid()) {
                 return;
             }
-            
+
+            $scope.loading = true;
             api.search($scope.query, $scope.startDate, $scope.endDate).then(function(res) {
+                $scope.loading = false;
                 $scope.publications = res;
             }, function(err) {
                 $window.console.log(err);
@@ -9278,6 +9289,14 @@ l(n.maxWidth,Number.MAX_VALUE)&&this.chartHeight<=l(n.maxHeight,Number.MAX_VALUE
 })(window.angular);
 
 angular.module('pubHistogram').run(['$templateCache', function($templateCache) {
+  $templateCache.put('components/phHistoCanvas.html',
+    '<div id="histogram-chart" ng-show="!$ctrl.loading"></div>\n' +
+    '<div class="holder" class="make-absolute" ng-show="$ctrl.loading">\n' +
+    '    <div class="loader"></div>\n' +
+    '</div>');
+}]);
+
+angular.module('pubHistogram').run(['$templateCache', function($templateCache) {
   $templateCache.put('components/phYearPicker.html',
     '<p class="input-group">\n' +
     '    <input type="text" class="form-control" uib-datepicker-popup="{{$ctrl.format}}" ng-model="$ctrl.dt" is-open="$ctrl.opened" datepicker-options="$ctrl.options" ng-required="true" alt-input-formats="$ctrl.altInputFormats" show-button-bar="false" ng-change="$ctrl.onDatePicked()">\n' +
@@ -9318,6 +9337,6 @@ angular.module('pubHistogram').run(['$templateCache', function($templateCache) {
     '        </div>\n' +
     '    </form>\n' +
     '\n' +
-    '    <ph-histo-canvas publications="publications"></ph-histo-canvas>\n' +
+    '    <ph-histo-canvas class="col-sm-12" publications="publications" loading="loading"></ph-histo-canvas>\n' +
     '</div>');
 }]);
