@@ -1,18 +1,26 @@
 describe('chartProviderFactory.test.js', function() {
-    var BarApi;
+    var BarChart;
+    var LineChart;
+    var ColumnChart;
     var chartProviderFactory;
 
     beforeEach(module('pubHistogram'));
 
     afterEach(function() {
-        BarApi = null;
+        BarChart = null;
+        LineChart = null;
+        ColumnChart = null;
         chartProviderFactory = null;
     });
 
     function initialize() {
-        BarApi = jasmine.createSpy('BarApi');
+        BarChart = jasmine.createSpy('BarChart');
+        LineChart = jasmine.createSpy('LineChart');
+        ColumnChart = jasmine.createSpy('ColumnChart');
         module(function($provide) {
-            $provide.value('BarApi', BarApi);
+            $provide.value('BarChart', BarChart);
+            $provide.value('LineChart', LineChart);
+            $provide.value('ColumnChart', ColumnChart);
         });
 
         inject(function($injector) {
@@ -29,10 +37,10 @@ describe('chartProviderFactory.test.js', function() {
 
         // Assert
         expect(api).toEqual(jasmine.any(Object));
-        expect(BarApi).toHaveBeenCalled();
+        expect(LineChart).toHaveBeenCalled();
     });
 
-    it('getApi_typePMC_setDefault', function() {
+    it('getApi_typeBar_setBar', function() {
         // Arrange
         initialize();
 
@@ -41,6 +49,18 @@ describe('chartProviderFactory.test.js', function() {
 
         // Assert
         expect(api).toEqual(jasmine.any(Object));
-        expect(BarApi).toHaveBeenCalled();
+        expect(BarChart).toHaveBeenCalled();
+    });
+
+    it('getApi_typeColumn_setBar', function() {
+        // Arrange
+        initialize();
+
+        // Act
+        var api = chartProviderFactory.getApi('column');
+
+        // Assert
+        expect(api).toEqual(jasmine.any(Object));
+        expect(ColumnChart).toHaveBeenCalled();
     });
 });

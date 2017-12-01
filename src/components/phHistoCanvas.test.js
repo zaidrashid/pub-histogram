@@ -3,6 +3,7 @@ describe('phYearPicker.test.js', function() {
     var scope;
     var $route;
     var $window;
+    var chartProviderFactory;
     beforeEach(module('pubHistogram'));
     beforeEach(module('testtemplates'));
     beforeEach(function() {
@@ -25,15 +26,27 @@ describe('phYearPicker.test.js', function() {
         };
 
         $route = jasmine.createSpy('route');
+        chartProviderFactory = jasmine.createSpyObj('chartProviderFactory', ['getApi']);
         module(function($provide) {
             $provide.value('$route', $route);
             $provide.value('$window', $window);
+            $provide.value('chartProviderFactory', chartProviderFactory);
         });
 
         inject(function($rootScope, $compile) {
             scope = $rootScope.$new();
             element = $compile(element)(scope);
             scope.$digest();
+        });
+
+        chartProviderFactory.getApi.and.callFake(function() {
+            return {
+                setTitle: jasmine.createSpy('setTitle'),
+                setData: jasmine.createSpy('setData'),
+                getConfiguration: function() {
+                    return {test: 'fake-config'};
+                }
+            };
         });
     }
 
@@ -42,8 +55,15 @@ describe('phYearPicker.test.js', function() {
         initialize();
         // Act
         var controller = element.isolateScope().$ctrl;
-
+        var changes = {
+            publications: {
+                currentValue: [1, 2, 3],
+                previousValue: [1, 2, 3, 4],
+            }
+        };
+        controller.$onChanges(changes);
         // Assert
-        expect(controller.publications).toBe(undefined);
+        expect(chartProviderFactory.getApi).toHaveBeenCalledWith('bar');
+        expect($window.Highcharts.chart).toHaveBeenCalledWith('histogram-chart', jasmine.any(Object));
     });
 });

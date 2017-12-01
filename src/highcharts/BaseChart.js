@@ -2,22 +2,28 @@
     'use strict';
     var app = $angular.module('pubHistogram');
 
-    app.factory('BarApi', function() {
-        var title = 'Bar Chart';
+    app.factory('BaseChart', function() {
+        var baseTitle = 'Base Chart';
         var xTitle = 'X Title';
         var xData = [];
         var yTitle = 'Y Title';
         var yData = [];
-        function BarApi() {
-            this.configuration = setBaseConfig();
+        function BaseChart(title) {
+            this.configuration = setBaseConfig(title);
         }
 
-        function setBaseConfig() {
+        function resetData() {
+            xData = [];
+            yData = [];
+        }
+
+        function setBaseConfig(title) {
+            resetData();
             return {
-                chart: {type: 'bar'},
-                title: {text: title},
+                title: {text: title || baseTitle},
                 xAxis: {
                     title: {text: xTitle},
+                    categories: []
                 },
                 yAxis: {
                     min: 0,
@@ -55,7 +61,6 @@
                 yData.push(yHolder);
             }
 
-
             this.configuration.xAxis.categories = xData;
             this.configuration.series.push({data: yData, name: ' Publications'});
         }
@@ -68,12 +73,12 @@
             return this.configuration;
         }
 
-        BarApi.prototype = {
+        BaseChart.prototype = {
             setData: setData,
             setTitle: setTitle,
             getConfiguration: getConfiguration
         };
 
-        return (BarApi);
+        return (BaseChart);
     });
 })(window.angular);
