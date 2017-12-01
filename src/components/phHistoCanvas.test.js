@@ -66,4 +66,19 @@ describe('phYearPicker.test.js', function() {
         expect(chartProviderFactory.getApi).toHaveBeenCalledWith('bar');
         expect($window.Highcharts.chart).toHaveBeenCalledWith('histogram-chart', jasmine.any(Object));
     });
+
+    it('loadingChanges_valueSetAccordingly', function() {
+        // Arrange
+        initialize();
+        // Act
+        var controller = element.isolateScope().$ctrl;
+        var changes = {
+            loading: {
+                currentValue: true,
+            }
+        };
+        controller.$onChanges(changes);
+        // Assert
+        expect(controller.loading).toBe(true);
+    });
 });

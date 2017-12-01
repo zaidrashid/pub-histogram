@@ -4,18 +4,27 @@
 
     var app = $angular.module('pubHistogram');
     app.component('phHistoCanvas', {
-        template: '<div id="histogram-chart"></div>',
+        templateUrl: 'components/phHistoCanvas.html',
         bindings: {
             publications: '<',
+            loading: '<'
         },
         controller: function($window, chartProviderFactory) {
             var $ctrl = this;
+            $ctrl.loading = false;
 
             $ctrl.$onChanges = function(changes) {
-                var newValue = changes.publications.currentValue;
-                var oldValue = changes.publications.previousValue;
-                if (newValue && newValue != oldValue) {
-                    doChartSetup(newValue);
+                if (changes.publications) {
+                    var newValue = changes.publications.currentValue;
+                    var oldValue = changes.publications.previousValue;
+                    if (newValue && newValue != oldValue) {
+                        doChartSetup(newValue);
+                    }
+                }
+
+                if (changes.loading) {
+                    var loading = changes.loading.currentValue;
+                    $ctrl.loading = loading;
                 }
             };
 
