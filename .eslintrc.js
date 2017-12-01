@@ -22,6 +22,7 @@ module.exports = {
     "globals": {
         "moment": true,
         "$angular": true,
-        "inject": true
+        "inject": true,
+        "Highcharts": true
     }
 };
