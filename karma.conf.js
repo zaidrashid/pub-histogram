@@ -22,6 +22,7 @@ module.exports = function(config) {
       'node_modules/angular-sanitize/angular-sanitize.min.js',
       'node_modules/angular-ui-bootstrap/dist/ui-bootstrap-tpls.js',
       'node_modules/moment/moment.js',
+      'node_modules/highcharts/highcharts.js',
       'src/mainModule.js',
       'src/mainRoute.js',
       'src/mainController.js',
@@ -31,6 +32,7 @@ module.exports = function(config) {
       'src/factory/**/*.js',
       'src/models/**/*.js',
       'src/publication/**/*.js',
+      'src/highcharts/**/*.js',
       'src/util/**/*js'
     ],
 
