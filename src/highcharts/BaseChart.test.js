@@ -102,4 +102,73 @@ describe('BaseChart.test.js', function() {
         expect(config.series).toEqual(jasmine.any(Array));
         expect(config.series.length).toEqual(0);
     });
+
+    it('setData_SingleAuthor_AuthorStringSetAccordingly', function() {
+        // Arrange
+        initialize();
+        var publicationMockData = [
+            {year: '2017', count: '250', mostCited: {title: 'title#001', authorString: 'William A.'}},
+        ];
+
+        // Act
+        var base = new BaseChart();
+        base.setData(publicationMockData);
+        var config = base.getConfiguration();
+
+        // Assert
+        expect(config.title.text).toBe('Base Chart');
+        expect(config.xAxis.categories).toEqual(jasmine.any(Array));
+        expect(config.xAxis.categories.length).toEqual(1);
+        expect(config.xAxis.categories[0]).toEqual(jasmine.any(Number));
+        expect(config.series).toEqual(jasmine.any(Array));
+        expect(config.series[0].data).toEqual(jasmine.any(Array));
+        expect(config.series[0].data.length).toEqual(1);
+        expect(config.series[0].data[0].by).toEqual('William A.');
+    });
+
+    it('setData_MoreThan1Author_AuthorStringSetAccordingly', function() {
+        // Arrange
+        initialize();
+        var publicationMockData = [
+            {year: '2017', count: '250', mostCited: {title: 'title#001', authorString: 'William A., William B.'}},
+        ];
+
+        // Act
+        var base = new BaseChart();
+        base.setData(publicationMockData);
+        var config = base.getConfiguration();
+
+        // Assert
+        expect(config.title.text).toBe('Base Chart');
+        expect(config.xAxis.categories).toEqual(jasmine.any(Array));
+        expect(config.xAxis.categories.length).toEqual(1);
+        expect(config.xAxis.categories[0]).toEqual(jasmine.any(Number));
+        expect(config.series).toEqual(jasmine.any(Array));
+        expect(config.series[0].data).toEqual(jasmine.any(Array));
+        expect(config.series[0].data.length).toEqual(1);
+        expect(config.series[0].data[0].by).toEqual('William A. and 1 more');
+    });
+
+    it('setData_NoAuthor_AuthorStringSetAccordingly', function() {
+        // Arrange
+        initialize();
+        var publicationMockData = [
+            {year: '2017', count: '250', mostCited: {title: 'title#001', authorString: ''}},
+        ];
+
+        // Act
+        var base = new BaseChart();
+        base.setData(publicationMockData);
+        var config = base.getConfiguration();
+
+        // Assert
+        expect(config.title.text).toBe('Base Chart');
+        expect(config.xAxis.categories).toEqual(jasmine.any(Array));
+        expect(config.xAxis.categories.length).toEqual(1);
+        expect(config.xAxis.categories[0]).toEqual(jasmine.any(Number));
+        expect(config.series).toEqual(jasmine.any(Array));
+        expect(config.series[0].data).toEqual(jasmine.any(Array));
+        expect(config.series[0].data.length).toEqual(1);
+        expect(config.series[0].data[0].by).toEqual('no data');
+    });
 });
