@@ -102,7 +102,7 @@ describe('PmcApi.test.js', function() {
 
     it('search_searchWillProduceCorrectString', function() {
         // Arrange
-        var query = 'malaria';
+        var query = {id: 'ANY', value: 'malaria'};
         var finalQuery = [
             'https://www.ebi.ac.uk/europepmc/webservices/rest/search/query=malaria%20AND%20(FIRST_PDATE%3A%5B2016-01-01%20TO%202016-12-31%5D)&sort=CITED%20desc&format=JSON&pageSize=1',
             'https://www.ebi.ac.uk/europepmc/webservices/rest/search/query=malaria%20AND%20(FIRST_PDATE%3A%5B2017-01-01%20TO%202017-12-31%5D)&sort=CITED%20desc&format=JSON&pageSize=1'];
@@ -118,13 +118,13 @@ describe('PmcApi.test.js', function() {
         api.search(query, startDate, endDate).then(function(res) {
             expect(networkUtil.httpMultipleGet).toHaveBeenCalled();
             expect(networkUtil.httpMultipleGet).toHaveBeenCalledWith(finalQuery);
-            expect(res.title).toBe('Publication related to "malaria" between 2016 to 2017');
+            expect(res.title).toBe('Publications related to "malaria" between 2016 to 2017');
         });
     });
 
     it('search_searchWillProduceCorrectString_withTitle', function() {
         // Arrange
-        var query = 'malaria';
+        var query = {id: 'ANY', value: 'malaria'};
         var finalQuery = [
             'https://www.ebi.ac.uk/europepmc/webservices/rest/search/query=malaria%20AND%20(FIRST_PDATE%3A%5B2016-01-01%20TO%202016-12-31%5D)&sort=CITED%20desc&format=JSON&pageSize=1'
         ];
@@ -140,7 +140,7 @@ describe('PmcApi.test.js', function() {
         api.search(query, startDate, endDate).then(function(res) {
             expect(networkUtil.httpMultipleGet).toHaveBeenCalled();
             expect(networkUtil.httpMultipleGet).toHaveBeenCalledWith(finalQuery);
-            expect(res.title).toBe('Publication related to "malaria" in the year 2016');
+            expect(res.title).toBe('Publications related to "malaria" in the year 2016');
         });
     });
 });

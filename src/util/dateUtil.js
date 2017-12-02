@@ -39,9 +39,15 @@
             return separatedYears;
         }
 
+        function generateDateRangeString(startYear, endYear) {
+            var q = '(FIRST_PDATE:[{0} TO {1}])';
+            return stringUtil.formatString(q, [startYear, endYear]);
+        }
+
         return {
             dateToString: dateToString,
-            separateYears: separateYears
+            separateYears: separateYears,
+            generateDateRangeString: generateDateRangeString
         };
     });
 })(window.angular);

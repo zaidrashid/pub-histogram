@@ -8,16 +8,19 @@
     <form>
         <div class='form-row'>
             <div class='col-md-6 col-xs-12'>
-                <label for='inlineFormInputName'>Search for...</label>
+                <label for='inlineFormInputName'>Search for:</label>
                 <input type='text' class='form-control mb-2 mb-sm-0' id='inlineFormInputName' placeholder='Try DNA' ng-model='searchText'
                     required>
+                <label ng-repeat='label in labels' class='radio-inline'>
+                    <input type='radio' name='{{label.name}}' value='{{label.value}}' ng-model='options.id'>{{label.name}}
+                </label>
             </div>
             <div class='col-md-2 col-xs-12'>
-                <label for='from'>from...</label>
+                <label for='from'>from:</label>
                 <ph-year-picker id='from' start-year='startYear' on-year-update='onStartYearUpdate(dt)'></ph-year-picker>
             </div>
             <div class='col-md-2 col-xs-12'>
-                <label for='to'>to...</label>
+                <label for='to'>to:</label>
                 <ph-year-picker id='to' start-year='endYear' on-year-update='onEndYearUpdate(dt)'></ph-year-picker>
             </div>
             <div class='col-md-2 col-xs-12'>

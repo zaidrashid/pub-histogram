@@ -8842,6 +8842,21 @@ l(n.maxWidth,Number.MAX_VALUE)&&this.chartHeight<=l(n.maxHeight,Number.MAX_VALUE
 
 (function($angular) {
     'use strict';
+
+    var app = $angular.module('pubHistogram');
+
+    /**
+     * curernt supported chartype: [
+     *  'bar', 'line', 'column'
+     * ]
+     */
+    app.constant('HISTOGRAM_OPTIONS', {
+        CHARTTYPE: 'bar'
+    });
+})(window.angular);
+
+(function($angular) {
+    'use strict';
     var app = $angular.module('pubHistogram');
 
     app.factory('LineChart', ["BaseChart", function(BaseChart) {
@@ -8880,8 +8895,8 @@ l(n.maxWidth,Number.MAX_VALUE)&&this.chartHeight<=l(n.maxHeight,Number.MAX_VALUE
 
     var app = $angular.module('pubHistogram');
 
-    app.factory('PmcApi', ["$q", "networkUtil", "stringUtil", "dateUtil", "publicationUtil", function($q, networkUtil, stringUtil, dateUtil, publicationUtil) {
-        var config = {
+    app.constant('PMC_API_OPTIONS', {
+        CONFIG: {
             type: 'query',
             baseUrl: 'https://www.ebi.ac.uk/europepmc/webservices/rest/search/',
             options: [
@@ -8889,7 +8904,17 @@ l(n.maxWidth,Number.MAX_VALUE)&&this.chartHeight<=l(n.maxHeight,Number.MAX_VALUE
                 {key: 'format', value: 'JSON'},
                 {key: 'pageSize', value: 1}
             ]
-        };
+        }
+    });
+})(window.angular);
+
+(function($angular) {
+    'use strict';
+
+    var app = $angular.module('pubHistogram');
+
+    app.factory('PmcApi', ["$q", "networkUtil", "stringUtil", "dateUtil", "publicationUtil", "PMC_API_OPTIONS", "SEARCH_OPTIONS", function($q, networkUtil, stringUtil, dateUtil, publicationUtil, PMC_API_OPTIONS, SEARCH_OPTIONS) {
+        var config = PMC_API_OPTIONS.CONFIG;
 
         function PmcApi() { }
 
@@ -8900,7 +8925,8 @@ l(n.maxWidth,Number.MAX_VALUE)&&this.chartHeight<=l(n.maxHeight,Number.MAX_VALUE
                                 stringUtil.formatString('in the year {0}', startYearStr) :
                                 stringUtil.formatString('between {0} to {1}', [startYearStr, endYearStr]);
 
-            return stringUtil.formatString('Publication related to "{0}" {1}', [query, yearSubTitle]);
+            var startTitle = stringUtil.generateTitleByQueryOption(query);
+            return stringUtil.formatString('{0} {1}', [startTitle, yearSubTitle]);
         }
 
         function search(query, startYear, endYear) {
@@ -8920,11 +8946,6 @@ l(n.maxWidth,Number.MAX_VALUE)&&this.chartHeight<=l(n.maxHeight,Number.MAX_VALUE
             return defer.promise;
         }
 
-        function generateDateRange(startYear, endYear) {
-            var q = '(FIRST_PDATE:[{0} TO {1}])';
-            return stringUtil.formatString(q, [startYear, endYear]);
-        }
-
         function addAditionalOptions(query) {
             for (var i=0; i < config.options.length; i++) {
                 var newKey = config.options[i].key;
@@ -8936,8 +8957,9 @@ l(n.maxWidth,Number.MAX_VALUE)&&this.chartHeight<=l(n.maxHeight,Number.MAX_VALUE
         }
 
         function generateQuery(query, startYear, endYear) {
-            var dateRange = generateDateRange(startYear, endYear);
-            var queryString = stringUtil.formatString('{0} AND {1}', [query, dateRange]);
+            var dateRange = dateUtil.generateDateRangeString(startYear, endYear);
+            var queryStr = stringUtil.generateQueryByOption(query);
+            var queryString = stringUtil.formatString('{0} AND {1}', [queryStr, dateRange]);
 
             var encodedQuery = encodeURIComponent(queryString);
             var baseQuery = stringUtil.formatString('{0}={1}', [config.type, encodedQuery]);
@@ -8972,6 +8994,18 @@ l(n.maxWidth,Number.MAX_VALUE)&&this.chartHeight<=l(n.maxHeight,Number.MAX_VALUE
         }
 
         return (Publication);
+    });
+})(window.angular);
+
+(function($angular) {
+    'use strict';
+
+    var app = $angular.module('pubHistogram');
+
+    app.constant('SEARCH_OPTIONS', {
+        ANY: {id: 'ANY', str: 'by any'},
+        TITLE: {id: 'TITLE', str: 'by title'},
+        ABSTRACT: {id: 'ABSTRACT', str: 'by abstract'},
     });
 })(window.angular);
 
@@ -9050,9 +9084,15 @@ l(n.maxWidth,Number.MAX_VALUE)&&this.chartHeight<=l(n.maxHeight,Number.MAX_VALUE
             return separatedYears;
         }
 
+        function generateDateRangeString(startYear, endYear) {
+            var q = '(FIRST_PDATE:[{0} TO {1}])';
+            return stringUtil.formatString(q, [startYear, endYear]);
+        }
+
         return {
             dateToString: dateToString,
-            separateYears: separateYears
+            separateYears: separateYears,
+            generateDateRangeString: generateDateRangeString
         };
     }]);
 })(window.angular);
@@ -9099,7 +9139,7 @@ l(n.maxWidth,Number.MAX_VALUE)&&this.chartHeight<=l(n.maxHeight,Number.MAX_VALUE
             publications: '<',
             loading: '<'
         },
-        controller: ["$window", "chartProviderFactory", function($window, chartProviderFactory) {
+        controller: ["$window", "chartProviderFactory", "HISTOGRAM_OPTIONS", function($window, chartProviderFactory, HISTOGRAM_OPTIONS) {
             var $ctrl = this;
             $ctrl.loading = false;
 
@@ -9119,7 +9159,7 @@ l(n.maxWidth,Number.MAX_VALUE)&&this.chartHeight<=l(n.maxHeight,Number.MAX_VALUE
             };
 
             function doChartSetup(publications) {
-                var chartApi = chartProviderFactory.getApi('bar');
+                var chartApi = chartProviderFactory.getApi(HISTOGRAM_OPTIONS.CHARTTYPE);
                 chartApi.setTitle(publications.title);
                 chartApi.setData(publications.data);
                 var finalConfig = chartApi.getConfiguration();
@@ -9258,8 +9298,14 @@ l(n.maxWidth,Number.MAX_VALUE)&&this.chartHeight<=l(n.maxHeight,Number.MAX_VALUE
 (function($angular) {
     var app = $angular.module('pubHistogram');
 
-    app.controller('searchController', ["$window", "$scope", "publicationApiFactory", function($window, $scope, publicationApiFactory) {
+    app.controller('searchController', ["$window", "$scope", "publicationApiFactory", "SEARCH_OPTIONS", function($window, $scope, publicationApiFactory, SEARCH_OPTIONS) {
         var api;
+        $scope.labels = [
+            {name: SEARCH_OPTIONS.ANY.str, value: SEARCH_OPTIONS.ANY.id},
+            {name: SEARCH_OPTIONS.TITLE.str, value: SEARCH_OPTIONS.TITLE.id},
+            {name: SEARCH_OPTIONS.ABSTRACT.str, value: SEARCH_OPTIONS.ABSTRACT.id}
+        ];
+        $scope.options = {id: $scope.labels[0].value};
 
         function init() {
             var currentYear = new Date().getFullYear();
@@ -9285,7 +9331,8 @@ l(n.maxWidth,Number.MAX_VALUE)&&this.chartHeight<=l(n.maxHeight,Number.MAX_VALUE
             }
 
             $scope.loading = true;
-            api.search($scope.searchText, $scope.startDate, $scope.endDate).then(function(res) {
+            $scope.options.value = $scope.searchText;
+            api.search($scope.options, $scope.startDate, $scope.endDate).then(function(res) {
                 $scope.loading = false;
                 $scope.publications = {};
                 $scope.publications.data = res.result;
@@ -9311,7 +9358,7 @@ l(n.maxWidth,Number.MAX_VALUE)&&this.chartHeight<=l(n.maxHeight,Number.MAX_VALUE
     'use strict';
 
     var app = $angular.module('pubHistogram');
-    app.factory('stringUtil', function() {
+    app.factory('stringUtil', ["SEARCH_OPTIONS", function(SEARCH_OPTIONS) {
         function formatString(format, params) {
             params = params || [];
             if (typeof params != 'object') {
@@ -9330,10 +9377,28 @@ l(n.maxWidth,Number.MAX_VALUE)&&this.chartHeight<=l(n.maxHeight,Number.MAX_VALUE
             return format.replace(new RegExp(oldValue, 'g'), newValue);
         }
 
+        function generateQueryByOption(query) {
+            if (query.id == SEARCH_OPTIONS.ANY.id) {
+                return query.value;
+            } else {
+                return formatString('({0}:{1})', [query.id, query.value]);
+            }
+        }
+
+        function generateTitleByQueryOption(query) {
+            if (query.id == SEARCH_OPTIONS.ANY.id) {
+                return formatString('Publications related to "{0}"', query.value);
+            } else {
+                return formatString('Publications containing the word "{0}" in {1}', [query.value, query.id]);
+            }
+        }
+
         return {
-            formatString: formatString
+            formatString: formatString,
+            generateQueryByOption: generateQueryByOption,
+            generateTitleByQueryOption: generateTitleByQueryOption
         };
-    });
+    }]);
 })(window.angular);
 
 angular.module('pubHistogram').run(['$templateCache', function($templateCache) {
@@ -9369,15 +9434,18 @@ angular.module('pubHistogram').run(['$templateCache', function($templateCache) {
     '    <form>\n' +
     '        <div class="form-row">\n' +
     '            <div class="col-md-6 col-xs-12">\n' +
-    '                <label for="inlineFormInputName">Search for...</label>\n' +
+    '                <label for="inlineFormInputName">Search for:</label>\n' +
     '                <input type="text" class="form-control mb-2 mb-sm-0" id="inlineFormInputName" placeholder="Try DNA" ng-model="searchText" required>\n' +
+    '                <label ng-repeat="label in labels" class="radio-inline">\n' +
+    '                    <input type="radio" name="{{label.name}}" value="{{label.value}}" ng-model="options.id">{{label.name}}\n' +
+    '                </label>\n' +
     '            </div>\n' +
     '            <div class="col-md-2 col-xs-12">\n' +
-    '                <label for="from">from...</label>\n' +
+    '                <label for="from">from:</label>\n' +
     '                <ph-year-picker id="from" start-year="startYear" on-year-update="onStartYearUpdate(dt)"></ph-year-picker>\n' +
     '            </div>\n' +
     '            <div class="col-md-2 col-xs-12">\n' +
-    '                <label for="to">to...</label>\n' +
+    '                <label for="to">to:</label>\n' +
     '                <ph-year-picker id="to" start-year="endYear" on-year-update="onEndYearUpdate(dt)"></ph-year-picker>\n' +
     '            </div>\n' +
     '            <div class="col-md-2 col-xs-12">\n' +

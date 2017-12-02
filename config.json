@@ -75,6 +75,7 @@
             "src/publication/**/!(*.test).js",
             "src/models/**/!(*.test).js",
             "src/highcharts/**/!(*.test).js",
+            "src/constant/**/!(*.test).js",
             ".build/js/templates.js"
         ],
         "css": []

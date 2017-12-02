@@ -3,16 +3,8 @@
 
     var app = $angular.module('pubHistogram');
 
-    app.factory('PmcApi', function($q, networkUtil, stringUtil, dateUtil, publicationUtil) {
-        var config = {
-            type: 'query',
-            baseUrl: 'https://www.ebi.ac.uk/europepmc/webservices/rest/search/',
-            options: [
-                {key: 'sort', value: 'CITED desc'},
-                {key: 'format', value: 'JSON'},
-                {key: 'pageSize', value: 1}
-            ]
-        };
+    app.factory('PmcApi', function($q, networkUtil, stringUtil, dateUtil, publicationUtil, PMC_API_OPTIONS, SEARCH_OPTIONS) {
+        var config = PMC_API_OPTIONS.CONFIG;
 
         function PmcApi() { }
 
@@ -23,7 +15,8 @@
                                 stringUtil.formatString('in the year {0}', startYearStr) :
                                 stringUtil.formatString('between {0} to {1}', [startYearStr, endYearStr]);
 
-            return stringUtil.formatString('Publication related to "{0}" {1}', [query, yearSubTitle]);
+            var startTitle = stringUtil.generateTitleByQueryOption(query);
+            return stringUtil.formatString('{0} {1}', [startTitle, yearSubTitle]);
         }
 
         function search(query, startYear, endYear) {
@@ -43,11 +36,6 @@
             return defer.promise;
         }
 
-        function generateDateRange(startYear, endYear) {
-            var q = '(FIRST_PDATE:[{0} TO {1}])';
-            return stringUtil.formatString(q, [startYear, endYear]);
-        }
-
         function addAditionalOptions(query) {
             for (var i=0; i < config.options.length; i++) {
                 var newKey = config.options[i].key;
@@ -59,8 +47,9 @@
         }
 
         function generateQuery(query, startYear, endYear) {
-            var dateRange = generateDateRange(startYear, endYear);
-            var queryString = stringUtil.formatString('{0} AND {1}', [query, dateRange]);
+            var dateRange = dateUtil.generateDateRangeString(startYear, endYear);
+            var queryStr = stringUtil.generateQueryByOption(query);
+            var queryString = stringUtil.formatString('{0} AND {1}', [queryStr, dateRange]);
 
             var encodedQuery = encodeURIComponent(queryString);
             var baseQuery = stringUtil.formatString('{0}={1}', [config.type, encodedQuery]);
