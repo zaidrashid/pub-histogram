@@ -11,11 +11,12 @@
             return date instanceof Date;
         }
 
-        function dateToString(date) {
+        function dateToString(date, format) {
+            format = format || config.DATE_FORMAT;
             if (!isDate(date)) {
                 return '';
             }
-            return moment(date).format(config.DATE_FORMAT);
+            return moment(date).format(format);
         }
 
         function separateYears(start, end) {

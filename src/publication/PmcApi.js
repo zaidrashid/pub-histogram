@@ -16,6 +16,16 @@
 
         function PmcApi() { }
 
+        function generateSearchTitle(query, startYear, endYear) {
+            var startYearStr = dateUtil.dateToString(startYear, 'YYYY');
+            var endYearStr = dateUtil.dateToString(endYear, 'YYYY');
+            var yearSubTitle = startYearStr === endYearStr ?
+                                stringUtil.formatString('in the year {0}', startYearStr) :
+                                stringUtil.formatString('between {0} to {1}', [startYearStr, endYearStr]);
+
+            return stringUtil.formatString('Publication related to "{0}" {1}', [query, yearSubTitle]);
+        }
+
         function search(query, startYear, endYear) {
             var defer = $q.defer();
             var years = dateUtil.separateYears(startYear, endYear);
@@ -27,7 +37,8 @@
 
             networkUtil.httpMultipleGet(requests).then(function(res) {
                 var result = publicationUtil.generatePublicationDataByYears(res);
-                defer.resolve(result);
+                var title = generateSearchTitle(query, startYear, endYear);
+                defer.resolve({result: result, title: title});
             }, defer.reject);
             return defer.promise;
         }

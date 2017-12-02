@@ -30,7 +30,9 @@
             $scope.loading = true;
             api.search($scope.searchText, $scope.startDate, $scope.endDate).then(function(res) {
                 $scope.loading = false;
-                $scope.publications = res;
+                $scope.publications = {};
+                $scope.publications.data = res.result;
+                $scope.publications.title = res.title;
             }, function(err) {
                 $window.console.log(err);
             });

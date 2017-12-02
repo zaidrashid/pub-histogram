@@ -8692,9 +8692,9 @@ l(n.maxWidth,Number.MAX_VALUE)&&this.chartHeight<=l(n.maxHeight,Number.MAX_VALUE
 
     app.factory('BaseChart', ["stringUtil", function(stringUtil) {
         var baseTitle = 'Base Chart';
-        var xTitle = 'X Title';
+        var xTitle = 'Years';
         var xData = [];
-        var yTitle = 'Y Title';
+        var yTitle = 'Publication Count';
         var yData = [];
         function BaseChart(title) {
             this.configuration = setBaseConfig(title);
@@ -8737,7 +8737,10 @@ l(n.maxWidth,Number.MAX_VALUE)&&this.chartHeight<=l(n.maxHeight,Number.MAX_VALUE
                 },
                 tooltip: {
                     formatter: toolTipFormatter
-                }
+                },
+                legend: {
+                    enabled: false
+                },
             };
         }
 
@@ -8890,6 +8893,16 @@ l(n.maxWidth,Number.MAX_VALUE)&&this.chartHeight<=l(n.maxHeight,Number.MAX_VALUE
 
         function PmcApi() { }
 
+        function generateSearchTitle(query, startYear, endYear) {
+            var startYearStr = dateUtil.dateToString(startYear, 'YYYY');
+            var endYearStr = dateUtil.dateToString(endYear, 'YYYY');
+            var yearSubTitle = startYearStr === endYearStr ?
+                                stringUtil.formatString('in the year {0}', startYearStr) :
+                                stringUtil.formatString('between {0} to {1}', [startYearStr, endYearStr]);
+
+            return stringUtil.formatString('Publication related to "{0}" {1}', [query, yearSubTitle]);
+        }
+
         function search(query, startYear, endYear) {
             var defer = $q.defer();
             var years = dateUtil.separateYears(startYear, endYear);
@@ -8901,7 +8914,8 @@ l(n.maxWidth,Number.MAX_VALUE)&&this.chartHeight<=l(n.maxHeight,Number.MAX_VALUE
 
             networkUtil.httpMultipleGet(requests).then(function(res) {
                 var result = publicationUtil.generatePublicationDataByYears(res);
-                defer.resolve(result);
+                var title = generateSearchTitle(query, startYear, endYear);
+                defer.resolve({result: result, title: title});
             }, defer.reject);
             return defer.promise;
         }
@@ -9008,11 +9022,12 @@ l(n.maxWidth,Number.MAX_VALUE)&&this.chartHeight<=l(n.maxHeight,Number.MAX_VALUE
             return date instanceof Date;
         }
 
-        function dateToString(date) {
+        function dateToString(date, format) {
+            format = format || config.DATE_FORMAT;
             if (!isDate(date)) {
                 return '';
             }
-            return moment(date).format(config.DATE_FORMAT);
+            return moment(date).format(format);
         }
 
         function separateYears(start, end) {
@@ -9103,10 +9118,10 @@ l(n.maxWidth,Number.MAX_VALUE)&&this.chartHeight<=l(n.maxHeight,Number.MAX_VALUE
                 }
             };
 
-            function doChartSetup(data) {
+            function doChartSetup(publications) {
                 var chartApi = chartProviderFactory.getApi('bar');
-                chartApi.setTitle('Publication across years');
-                chartApi.setData(data);
+                chartApi.setTitle(publications.title);
+                chartApi.setData(publications.data);
                 var finalConfig = chartApi.getConfiguration();
                 $window.Highcharts.chart('histogram-chart', finalConfig);
             }
@@ -9272,7 +9287,9 @@ l(n.maxWidth,Number.MAX_VALUE)&&this.chartHeight<=l(n.maxHeight,Number.MAX_VALUE
             $scope.loading = true;
             api.search($scope.searchText, $scope.startDate, $scope.endDate).then(function(res) {
                 $scope.loading = false;
-                $scope.publications = res;
+                $scope.publications = {};
+                $scope.publications.data = res.result;
+                $scope.publications.title = res.title;
             }, function(err) {
                 $window.console.log(err);
             });

@@ -28,10 +28,10 @@
                 }
             };
 
-            function doChartSetup(data) {
+            function doChartSetup(publications) {
                 var chartApi = chartProviderFactory.getApi('bar');
-                chartApi.setTitle('Publication across years');
-                chartApi.setData(data);
+                chartApi.setTitle(publications.title);
+                chartApi.setData(publications.data);
                 var finalConfig = chartApi.getConfiguration();
                 $window.Highcharts.chart('histogram-chart', finalConfig);
             }
