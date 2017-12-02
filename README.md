@@ -26,16 +26,16 @@ Folder Structure
 | .build/      | Early compilation of the app |
 | docs/      | Final build with .js and .css compiled. Use for [github.io](https://zaidrashid.github.io/pub-histogram)     |
 | src/ | The main source code file     |
-| src/assets/scss/| Contains scss files. Copiled with `gulp-sass`|
+| src/assets/scss/| Contains scss files. Compiled with `gulp-sass`|
 | src/components/| Components used in the app. This includes the histogram canvas and the year picker. Uses AngularJS component modules|
 | src/constant/| All the constant files, mainly options used in the App. |
 | src/factory/| Contains the factory files to get the usage of the chart or the API we want to use. |
-|src/highcharts/| All the classes use to intiate the highcharts. Used by the factory to initialize it. Expand this files, to add other type of charts|
+|src/highcharts/| All the classes used to intiate the highcharts. Used by the factory to initialize it. Expand this folder to add other type of charts|
 |src/models/| Base object for data manipulation |
 |src/publication/| Contains the API implementation. For now there is only implementation for PMC API. In future, expand this folder to add more APIs|
-| src/search/ | The search page codes. Includes html, and js file. |
+| src/search/ | The search page codes. Includes html, and .js file for controllers. |
 | src/util/| All utility classes, such as string, date, and etc. |
-| src/index.html| A template html file. Use to inject the required .js and .css files based on config.json|
+| src/index.html| A template html file. Used to inject the required .js and .css files based on config.json|
 | src/mainController.js| The main controller for the app. |
 | src/mainModule.js | The main initialization of the Angular app. |
 | src/mainRoute.js | The Angular routing service |
@@ -46,13 +46,13 @@ Getting the data
 
 * Creating the query string.
 
-The core usage of this app is to be able to search for publications based on a query between years selected. For e.g. to search for `malaria` between the year 2016 - 2017 will separte the queries to 2 sets of query string as below (or refer to [/src/publication/PmcApi.js](https://github.com/zaidrashid/pub-histogram/blob/master/src/publication/PmcApi.js))
+The core usage of this app is to be able to search for publications based on a query between years selected. For e.g. to search for `malaria` between the year 2016 - 2017 will separte the queries to 2 sets of query string as below (or refer to [/src/publication/PmcApi.js](https://github.com/zaidrashid/pub-histogram/blob/master/src/publication/PmcApi.js)
 
 `[https://www.ebi.ac.uk/europepmc/webservices/rest/search/query=malaria%20AND%20(FIRST_PDATE%3A%5B2016-01-01%20TO%202016-12-31%5D)&sort=CITED%20desc&format=JSON&pageSize=1,
 https://www.ebi.ac.uk/europepmc/webservices/rest/search/query=malaria%20AND%20(FIRST_PDATE%3A%5B2017-01-01%20TO%202017-12-31%5D)&sort=CITED%20desc&format=JSON&pageSize=1]
 `
 
-* Getting the most cited publications
+* Getting the most cited publication
 
 The api provided options to achieve this goal. Since we want just the highest number of cited publication, we can sort based on CITED descending, and only return a single publication. The configuration set can be seen in [/src/constant/PMC_OPTIONS.js](https://github.com/zaidrashid/pub-histogram/blob/master/src/constant/PMC_API_OPTIONS.js) or as below:
 
@@ -70,18 +70,18 @@ CONFIG: {
 
 * Formatting the data
 
-The [publicationUtil.js](https://github.com/zaidrashid/pub-histogram/blob/master/src/util/publicationUtil.js) will format the data retrieved from the request. Since we only need the number of publication per year, and the most cited we format those in the utility class.
+The [publicationUtil.js](https://github.com/zaidrashid/pub-histogram/blob/master/src/util/publicationUtil.js) will format the data retrieved from the request. Since we only need the number of publication per year, and the most cited, we will then include those in the utility class.
 
 The factory pattern
 -----------------
 
 * Getting the API. 
 
-The PMC api is initialized by the [publicationApiFactory.js](https://github.com/zaidrashid/pub-histogram/blob/master/src/factory/publicationApiFactory.js) and it follows the factory pattern. Although, it requires and interface (in this case a base class), I did not implement it yet as there's only a single API instance. 
+The PMC API is initialized by the [publicationApiFactory.js](https://github.com/zaidrashid/pub-histogram/blob/master/src/factory/publicationApiFactory.js) and it follows the factory pattern. Although, it requires and interface (in this case a base class), I did not implement it yet as there's only a single API instance. 
 
 * Setting the charts
 
-Similarly, the [chartProviderFactory.js](https://github.com/zaidrashid/pub-histogram/blob/master/src/factory/chartProviderFactory.js) sets the chart based on [HISTOGRAM_OPTIONS.js](https://github.com/zaidrashid/pub-histogram/blob/master/src/constant/HISTOGRAM_OPTIONS.js). For now it is set on stone from the constant file to 'bar' chart. All type of charts will implement the [BaseChart](https://github.com/zaidrashid/pub-histogram/blob/master/src/highcharts/BaseChart.js) where the implementation of setting the data, title, etc. 
+Similarly, the [chartProviderFactory.js](https://github.com/zaidrashid/pub-histogram/blob/master/src/factory/chartProviderFactory.js) sets the chart based on [HISTOGRAM_OPTIONS.js](https://github.com/zaidrashid/pub-histogram/blob/master/src/constant/HISTOGRAM_OPTIONS.js). For now it is set to 'bar' chart (you can change this to 'line' or 'column'). All type of charts will implement the [BaseChart](https://github.com/zaidrashid/pub-histogram/blob/master/src/highcharts/BaseChart.js) where it contains the implementation of setting the data, title, etc. 
 
 
 Highcharts usage
