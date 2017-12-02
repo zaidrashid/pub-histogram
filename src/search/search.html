@@ -1,28 +1,33 @@
-<div class='search' ng-controller="searchController">
+<div class='search' ng-controller='searchController'>
 
-    <div class="title jumbotron">
-        <h2 class="display-1">Publication Histogram</h2>
-        <p class="lead">A histogram of publication (across years) based on queries from Europe PMC.</p>
+    <div class='title jumbotron'>
+        <h2 class='display-1'>Publication Histogram</h2>
+        <p class='lead'>A histogram of publication (across years) based on queries in Europe PMC.</p>
     </div>
 
     <form>
-        <div class="form-row">
-            <div class="col-sm-5">
-                <input type="text" class="form-control mb-2 mb-sm-0" id="inlineFormInputName" placeholder="Try DNA" ng-model="searchText" required>
+        <div class='form-row'>
+            <div class='col-md-6 col-xs-12'>
+                <label for='inlineFormInputName'>Search for...</label>
+                <input type='text' class='form-control mb-2 mb-sm-0' id='inlineFormInputName' placeholder='Try DNA' ng-model='searchText'
+                    required>
             </div>
-            from
-            <div class="col-sm-2" ng-class='startYearHasError'>
-                <ph-year-picker start-year='startYear' on-year-update="onStartYearUpdate(dt)"></ph-year-picker>
+            <div class='col-md-2 col-xs-12'>
+                <label for='from'>from...</label>
+                <ph-year-picker id='from' start-year='startYear' on-year-update='onStartYearUpdate(dt)'></ph-year-picker>
             </div>
-            to
-            <div class="col-sm-2" ng-class='endYearHasError'>
-                <ph-year-picker start-year='endYear' on-year-update="onEndYearUpdate(dt)"></ph-year-picker>
+            <div class='col-md-2 col-xs-12'>
+                <label for='to'>to...</label>
+                <ph-year-picker id='to' start-year='endYear' on-year-update='onEndYearUpdate(dt)'></ph-year-picker>
             </div>
-            <div class="col-auto">
-                <button type="submit" class="btn btn-primary" ng-click="onSearch()">Search</button>
+            <div class='col-md-2 col-xs-12'>
+                <label>&nbsp;</label>
+                <div>
+                    <button type='submit' class='btn btn-primary' ng-click='onSearch()'>Search</button>
+                </div>
             </div>
         </div>
     </form>
 
-    <ph-histo-canvas class="col-sm-12" publications="publications" loading="loading"></ph-histo-canvas>
+    <ph-histo-canvas class='col-sm-12' publications='publications' loading='loading'></ph-histo-canvas>
 </div>
