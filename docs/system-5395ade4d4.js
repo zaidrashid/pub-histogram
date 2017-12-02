@@ -8690,7 +8690,7 @@ l(n.maxWidth,Number.MAX_VALUE)&&this.chartHeight<=l(n.maxHeight,Number.MAX_VALUE
     'use strict';
     var app = $angular.module('pubHistogram');
 
-    app.factory('BaseChart', function() {
+    app.factory('BaseChart', ["stringUtil", function(stringUtil) {
         var baseTitle = 'Base Chart';
         var xTitle = 'X Title';
         var xData = [];
@@ -8704,6 +8704,16 @@ l(n.maxWidth,Number.MAX_VALUE)&&this.chartHeight<=l(n.maxHeight,Number.MAX_VALUE
             xData = [];
             yData = [];
         }
+
+        var toolTipFormatter = function() {
+            var string = 'Publication count: <b>{0}</b><br> ' +
+                        'Most Cited Publication: <b>{1}</b><br>' +
+                        'By: <b>{2}</b><br>' +
+                        'Cited: <b>{3} times<b>';
+
+            return stringUtil.formatString(string,
+                    [this.point.y, this.point.mostCited, this.point.by, this.point.cited]);
+        };
 
         function setBaseConfig(title) {
             resetData();
@@ -8724,8 +8734,27 @@ l(n.maxWidth,Number.MAX_VALUE)&&this.chartHeight<=l(n.maxHeight,Number.MAX_VALUE
                 },
                 credits: {
                     enabled: false
+                },
+                tooltip: {
+                    formatter: toolTipFormatter
                 }
             };
+        }
+
+        function setAuthorsString(authorsString) {
+            if (!authorsString) {
+                return 'no data';
+            }
+
+            var authors = authorsString.split(', ');
+            var authorStr;
+            if (authors.length == 1) {
+                authorStr = authors[0];
+            } else {
+                authorStr = stringUtil.formatString('{0} and {1} more', [authors[0], authors.length - 1]);
+            }
+
+            return authorStr;
         }
 
         function setData(publication) {
@@ -8744,7 +8773,9 @@ l(n.maxWidth,Number.MAX_VALUE)&&this.chartHeight<=l(n.maxHeight,Number.MAX_VALUE
 
                 var yHolder = {
                     y: pub.count,
-                    mostCited: pub.mostCited.title
+                    mostCited: pub.mostCited.title,
+                    by: setAuthorsString(pub.mostCited.authorString),
+                    cited: pub.mostCited.citedByCount
                 };
                 yData.push(yHolder);
             }
@@ -8768,7 +8799,7 @@ l(n.maxWidth,Number.MAX_VALUE)&&this.chartHeight<=l(n.maxHeight,Number.MAX_VALUE
         };
 
         return (BaseChart);
-    });
+    }]);
 })(window.angular);
 
 (function($angular) {
@@ -9239,7 +9270,7 @@ l(n.maxWidth,Number.MAX_VALUE)&&this.chartHeight<=l(n.maxHeight,Number.MAX_VALUE
             }
 
             $scope.loading = true;
-            api.search($scope.query, $scope.startDate, $scope.endDate).then(function(res) {
+            api.search($scope.searchText, $scope.startDate, $scope.endDate).then(function(res) {
                 $scope.loading = false;
                 $scope.publications = res;
             }, function(err) {
