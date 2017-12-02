@@ -9321,7 +9321,8 @@ l(n.maxWidth,Number.MAX_VALUE)&&this.chartHeight<=l(n.maxHeight,Number.MAX_VALUE
         function isQueryValid() {
             var valid = $scope.searchText &&
                         $scope.startDate &&
-                        $scope.endDate;
+                        $scope.endDate &&
+                        $scope.endDate.getTime() > $scope.startDate.getTime();
             return valid;
         }
 
