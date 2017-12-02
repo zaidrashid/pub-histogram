@@ -4,9 +4,9 @@
 
     app.factory('BaseChart', function(stringUtil) {
         var baseTitle = 'Base Chart';
-        var xTitle = 'X Title';
+        var xTitle = 'Years';
         var xData = [];
-        var yTitle = 'Y Title';
+        var yTitle = 'Publication Count';
         var yData = [];
         function BaseChart(title) {
             this.configuration = setBaseConfig(title);
@@ -49,7 +49,10 @@
                 },
                 tooltip: {
                     formatter: toolTipFormatter
-                }
+                },
+                legend: {
+                    enabled: false
+                },
             };
         }
 

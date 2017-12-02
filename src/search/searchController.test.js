@@ -62,7 +62,7 @@ describe('searchController.test.js', function() {
                 search: function() {
                     return {
                         then: function(success, fail) {
-                            success(true);
+                            success({result: 'results', title: 'title'});
                         }
                     };
                 }
@@ -77,7 +77,8 @@ describe('searchController.test.js', function() {
         $scope.onSearch();
 
         // Assert
-        expect($scope.publications).toBeTruthy();
+        expect($scope.publications.data).toBeTruthy();
+        expect($scope.publications.title).toBeTruthy();
     });
 
     it('onSearch_gotError_publicationsWillBeFalsy', function() {
