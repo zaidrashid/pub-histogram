@@ -1,7 +1,12 @@
 .search{
     .form-row{
-        display: flex;
-        align-items: center;
+        label {
+            margin-top: 0.2em;
+        }
+
+        button {
+            width: 100%;
+        }
     }
 
     ph-year-picker{

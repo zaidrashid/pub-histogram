@@ -9363,24 +9363,28 @@ angular.module('pubHistogram').run(['$templateCache', function($templateCache) {
     '\n' +
     '    <div class="title jumbotron">\n' +
     '        <h2 class="display-1">Publication Histogram</h2>\n' +
-    '        <p class="lead">A histogram of publication (across years) based on queries from Europe PMC.</p>\n' +
+    '        <p class="lead">A histogram of publication (across years) based on queries in Europe PMC.</p>\n' +
     '    </div>\n' +
     '\n' +
     '    <form>\n' +
     '        <div class="form-row">\n' +
-    '            <div class="col-sm-5">\n' +
+    '            <div class="col-md-6 col-xs-12">\n' +
+    '                <label for="inlineFormInputName">Search for...</label>\n' +
     '                <input type="text" class="form-control mb-2 mb-sm-0" id="inlineFormInputName" placeholder="Try DNA" ng-model="searchText" required>\n' +
     '            </div>\n' +
-    '            from\n' +
-    '            <div class="col-sm-2" ng-class="startYearHasError">\n' +
-    '                <ph-year-picker start-year="startYear" on-year-update="onStartYearUpdate(dt)"></ph-year-picker>\n' +
+    '            <div class="col-md-2 col-xs-12">\n' +
+    '                <label for="from">from...</label>\n' +
+    '                <ph-year-picker id="from" start-year="startYear" on-year-update="onStartYearUpdate(dt)"></ph-year-picker>\n' +
     '            </div>\n' +
-    '            to\n' +
-    '            <div class="col-sm-2" ng-class="endYearHasError">\n' +
-    '                <ph-year-picker start-year="endYear" on-year-update="onEndYearUpdate(dt)"></ph-year-picker>\n' +
+    '            <div class="col-md-2 col-xs-12">\n' +
+    '                <label for="to">to...</label>\n' +
+    '                <ph-year-picker id="to" start-year="endYear" on-year-update="onEndYearUpdate(dt)"></ph-year-picker>\n' +
     '            </div>\n' +
-    '            <div class="col-auto">\n' +
-    '                <button type="submit" class="btn btn-primary" ng-click="onSearch()">Search</button>\n' +
+    '            <div class="col-md-2 col-xs-12">\n' +
+    '                <label>&nbsp;</label>\n' +
+    '                <div>\n' +
+    '                    <button type="submit" class="btn btn-primary" ng-click="onSearch()">Search</button>\n' +
+    '                </div>\n' +
     '            </div>\n' +
     '        </div>\n' +
     '    </form>\n' +
