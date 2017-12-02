@@ -1,8 +1,14 @@
 (function($angular) {
     var app = $angular.module('pubHistogram');
 
-    app.controller('searchController', function($window, $scope, publicationApiFactory) {
+    app.controller('searchController', function($window, $scope, publicationApiFactory, SEARCH_OPTIONS) {
         var api;
+        $scope.labels = [
+            {name: SEARCH_OPTIONS.ANY.str, value: SEARCH_OPTIONS.ANY.id},
+            {name: SEARCH_OPTIONS.TITLE.str, value: SEARCH_OPTIONS.TITLE.id},
+            {name: SEARCH_OPTIONS.ABSTRACT.str, value: SEARCH_OPTIONS.ABSTRACT.id}
+        ];
+        $scope.options = {id: $scope.labels[0].value};
 
         function init() {
             var currentYear = new Date().getFullYear();
@@ -28,7 +34,8 @@
             }
 
             $scope.loading = true;
-            api.search($scope.searchText, $scope.startDate, $scope.endDate).then(function(res) {
+            $scope.options.value = $scope.searchText;
+            api.search($scope.options, $scope.startDate, $scope.endDate).then(function(res) {
                 $scope.loading = false;
                 $scope.publications = {};
                 $scope.publications.data = res.result;

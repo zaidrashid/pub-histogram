@@ -33,7 +33,8 @@ module.exports = function(config) {
       'src/models/**/*.js',
       'src/publication/**/*.js',
       'src/highcharts/**/*.js',
-      'src/util/**/*js'
+      'src/util/**/*.js',
+      'src/constant/**/*.js'
     ],
 
 

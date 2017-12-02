@@ -43,4 +43,52 @@ describe('stringUtil.test.js', function() {
         // Assert
         expect(str).toBe('{0} and {1} will be {2}');
     });
+
+    it('generateQueryByOption_queryIsAny_returnBackValue', function() {
+        // Arrange
+        initialize();
+        var query = {id: 'ANY', value: 'search query'};
+
+        // Act
+        var str = stringUtil.generateQueryByOption(query);
+
+        // Assert
+        expect(str).toBe(query.value);
+    });
+
+    it('generateQueryByOption_queryIsOtherThanAny_returnBackValue', function() {
+        // Arrange
+        initialize();
+        var query = {id: 'TITLE', value: 'search query'};
+
+        // Act
+        var str = stringUtil.generateQueryByOption(query);
+
+        // Assert
+        expect(str).toBe('(' + query.id + ':' + query.value + ')');
+    });
+
+    it('generateTitleByQueryOption_queryIsAny_returnBackValue', function() {
+        // Arrange
+        initialize();
+        var query = {id: 'ANY', value: 'malaria'};
+
+        // Act
+        var str = stringUtil.generateTitleByQueryOption(query);
+
+        // Assert
+        expect(str).toBe('Publications related to "' + query.value + '"');
+    });
+
+    it('generateTitleByQueryOption_queryIsOtherThanAny_returnBackValue', function() {
+        // Arrange
+        initialize();
+        var query = {id: 'TITLE', value: 'malaria'};
+
+        // Act
+        var str = stringUtil.generateTitleByQueryOption(query);
+
+        // Assert
+        expect(str).toBe('Publications containing the word "' + query.value + '" in '+ query.id);
+    });
 });

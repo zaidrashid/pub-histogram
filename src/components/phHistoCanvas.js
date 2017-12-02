@@ -9,7 +9,7 @@
             publications: '<',
             loading: '<'
         },
-        controller: function($window, chartProviderFactory) {
+        controller: function($window, chartProviderFactory, HISTOGRAM_OPTIONS) {
             var $ctrl = this;
             $ctrl.loading = false;
 
@@ -29,7 +29,7 @@
             };
 
             function doChartSetup(publications) {
-                var chartApi = chartProviderFactory.getApi('bar');
+                var chartApi = chartProviderFactory.getApi(HISTOGRAM_OPTIONS.CHARTTYPE);
                 chartApi.setTitle(publications.title);
                 chartApi.setData(publications.data);
                 var finalConfig = chartApi.getConfiguration();
